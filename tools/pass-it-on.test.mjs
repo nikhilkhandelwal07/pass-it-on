@@ -61,7 +61,7 @@ check("no external src/href/@import", !/(src|href)\s*=\s*["'](?!#)[^"']+["']/i.t
 check("no 'net shortage' / 'adjusted' / 'covered by' wording", !/net shortage|adjusted need|covered by book bank/i.test(src));
 const keysets = await ev(`Object.fromEntries(Object.entries(I18N).map(([k,v])=>[k,Object.keys(v).sort().join('|')]))`);
 check("all 4 languages have identical key sets", new Set(Object.values(keysets)).size === 1 && Object.keys(keysets).length === 4);
-const crcFnSrc = await ev("crcView.toString() + officialRows.toString() + officialSchoolRow.toString() + statementDoc.toString()");
+const crcFnSrc = await ev("crcView.toString() + officialRows.toString() + officialRowFor.toString() + ownRows.toString() + demandLines.toString() + statementDoc.toString()");
 check("CRC/statement code never reads Book Bank data", !/copies|localFigures|noPhysical|holder|covering/.test(crcFnSrc));
 
 console.log("\n# Initial state (60 entitled, 50 received)");
@@ -120,7 +120,7 @@ const crcText = await ev("document.querySelector('#view').innerText");
 const crcHtml = await ev("document.documentElement.outerHTML.replace(/<script[\\s\\S]*?<\\/script>/g,'')");
 check("CRC School A pending = 10", await ev("document.querySelector('#crc-table tbody tr').children[6].textContent.trim()") === "10");
 check("CRC School A longest pending = 31 days", (await ev("document.querySelector('#crc-table tbody tr').children[7].textContent")).includes("31"));
-const leaks = ["BB-6", "Asha", "Ravi", "Meena", "Pass It On copies", "Book Bank shelf", "temporary copies issued", "Children without any physical copy"].filter(w => crcHtml.includes(w));
+const leaks = ["BB-6", "Asha", "Ravi", "Meena", "Arjun", "Pass It On copies", "Book Bank shelf", "temporary copies issued", "Children without any physical copy"].filter(w => crcHtml.includes(w));
 check("CRC DOM contains no Book Bank / borrower data", leaks.length === 0, leaks.join(", "));
 check("CRC shows privacy notice", crcText.includes("deliberately does not contain donated stock"));
 check("CRC shows demand signal 60 not 30", crcText.includes("60 students for this class") && crcText.includes("30"));
@@ -171,10 +171,10 @@ await click('[data-action="open-reset"]'); await click('[data-action="reset-conf
 await click('[data-action="open-give"]'); await click('[data-action="give-confirm"]'); await click('#dlg [data-action="close"]'); // Asha
 await click('[data-action="open-give"]'); await click('[data-action="give-confirm"]'); await click('#dlg [data-action="close"]'); // Ravi
 c = await cards(); check("two lent: 10/5/8", c.p === 10 && c.a === 5 && c.n === 8, JSON.stringify(c));
-await click('[data-action="open-govt"]'); await ev("document.querySelector('#qty').value='3'"); await click('[data-action="govt-confirm"]');
+await click('[data-action="open-govt"]'); await ev("(()=>{const q=document.querySelector('#qty'); q.value='3'; q.dispatchEvent(new Event('input',{bubbles:true}))})()"); await click('[data-action="govt-confirm"]');
 c = await cards(); check("3 arrive (Asha, Ravi, Meena): pending 7, no-copy 7", c.p === 7 && c.n === 7, JSON.stringify(c));
 await click('#dlg [data-action="close"]');
-check("CRC longest now Salim 18 days", (await ev("officialSchoolRow().longest")) === 18);
+check("CRC longest now Salim 18 days", (await ev("officialRowFor(currentGroup()).longest")) === 18);
 await click('[data-action="open-reset"]'); await click('[data-action="reset-confirm"]');
 // Exhaust shelf
 for (let i = 0; i < 7; i++) { await click('[data-action="open-give"]'); await click('[data-action="give-confirm"]'); await click('#dlg [data-action="close"]'); }
@@ -184,8 +184,78 @@ check("empty shelf message", (await text("#dlg")).includes("No Pass It On copy i
 await click('#dlg [data-action="close"]');
 await click('[data-action="open-reset"]'); await click('[data-action="reset-confirm"]');
 
+console.log("\n# Classes, subjects and the waiting list");
+const setVal = (sel, v) => ev(`(()=>{const e=document.querySelector(${JSON.stringify(sel)}); e.value=${JSON.stringify(v)}; e.dispatchEvent(new Event('input',{bubbles:true})); e.dispatchEvent(new Event('change',{bubbles:true})); return e.value})()`);
+check("demo has 3 classes in the picker", (await ev("document.querySelectorAll('#group-select option').length")) === 3);
+await click('[data-action="open-group-new"]');
+await setVal("#f-class", "10"); await setVal("#f-subject", "english");
+await setVal("#f-entitled", "30"); await setVal("#f-received", "40");
+await click('[data-action="group-save"]');
+check("received > entitled is rejected", ((await text("#dlg .error")) || "").includes("cannot be more"));
+await setVal("#f-entitled", "40"); await setVal("#f-received", "35"); await setVal("#f-last", "38");
+await click('[data-action="group-save"]');
+await shot("16-group-added"); check("new class saved and selected", (await ev("document.querySelector('#group-select').selectedOptions[0].textContent")).includes("Class 10 · English"));
+c = await cards(); check("new class: 5 pending, 0 copies, 5 without a book", c.p === 5 && c.a === 0 && c.n === 5, JSON.stringify(c));
+check("unnamed children flagged", (await ev("document.querySelector('#view').innerText")).includes("5 more children are still owed a book"));
+await click('#dlg [data-action="open-list"]');
+check("list dialog opens from 'Add children now'", (await text("#dlg-title")).includes("have not received"));
+await setVal("#names", "Ananya\nKiran\n\n  Rohit  ");
+await click('[data-action="list-add"]');
+check("3 names added (blank lines ignored, spaces trimmed)", (await text("#dlg .namecount")).includes("3 of 5"), await text("#dlg .namecount"));
+await setVal("#names", "Kiran");
+await click('[data-action="list-add"]');
+check("duplicate name refused", ((await text("#dlg .error")) || "").includes("Already on the list: Kiran"));
+await setVal("#names", "Zoya\nVikram\nNeha");
+await click('[data-action="list-add"]');
+check("cannot name more children than books pending", ((await text("#dlg .error")) || "").includes("Only 2 more names"));
+await setVal("#names", "<img src=x onerror=window.__xss=1>\nNeha");
+await click('[data-action="list-add"]');
+await shot("13-list-dialog"); check("5 of 5 named", (await text("#dlg .namecount")).includes("5 of 5"));
+check("typed names are shown as text, never run as code", (await ev("document.querySelectorAll('#view img, #dlg img').length")) === 0 && !(await ev("window.__xss")) && (await ev("document.querySelector('#view').innerText")).includes("<img src=x"));
+await click('#dlg [data-action="close"]');
+check("unnamed warning gone", !(await ev("document.querySelector('#view').innerText")).includes("more children are still owed"));
+await click('[data-action="open-add"]'); await click('[data-action="add-yes"]');
+check("copy code follows class+subject: BB-10-ENG-001", (await text("#dlg")).includes("BB-10-ENG-001"));
+await click('#dlg [data-action="close"]');
+await click('[data-action="open-give"]'); await click('[data-action="give-confirm"]'); await click('#dlg [data-action="close"]');
+c = await cards(); check("lend in new class: pending stays 5, 0 on shelf, 4 without", c.p === 5 && c.a === 0 && c.n === 4, JSON.stringify(c));
+await click('[data-action="open-govt"]');
+await setVal("#qty", "1");
+await shot("14-govt-ticks"); check("changing the number re-ticks the longest-waiting child", (await ev("document.querySelectorAll('#dlg input[name=got]:checked').length")) === 1);
+await ev("[...document.querySelectorAll('#dlg input[name=got]')].slice(0,2).forEach(b=>{b.checked=true})");
+await click('[data-action="govt-confirm"]');
+check("more ticks than books is refused", ((await text("#qty-err")) || "").includes("ticked 2 children but recorded only 1"), await text("#qty-err"));
+await setVal("#qty", "2");
+await click('[data-action="govt-confirm"]');
+c = await cards(); check("2 govt books: pending 5 → 3", c.p === 3, JSON.stringify(c));
+await click('#dlg [data-action="close"]');
+await click('[data-action="open-group-edit"]');
+await setVal("#f-entitled", "38");
+await click('[data-action="group-save"]');
+check("edit cannot drop entitled below the named waiting list", ((await text("#dlg .error")) || "").includes("too low"));
+await setVal("#f-entitled", "42"); await click('[data-action="group-save"]');
+c = await cards(); check("enrolment raised to 42: pending 5", c.p === 5, JSON.stringify(c));
+await click('[data-action="open-list"]');
+const removable = await ev("document.querySelectorAll('#dlg [data-action=list-remove]').length");
+const beforeRows = await ev("document.querySelectorAll('#dlg .rows li').length");
+await click('#dlg [data-action="list-remove"]');
+check("child can be removed; child holding a copy cannot", (await ev("document.querySelectorAll('#dlg .rows li').length")) === beforeRows - 1 && removable === beforeRows - 1, `${removable}/${beforeRows}`);
+await click('#dlg [data-action="close"]');
+await load();
+check("selected class persists after reload", (await ev("document.querySelector('#group-select').selectedOptions[0].textContent")).includes("Class 10"));
+await click('[data-action="set-role"][data-role="crc"]');
+const crc2 = await ev("document.documentElement.outerHTML.replace(/<script[\\s\\S]*?<\\/script>/g,'')");
+await fullShot("15-crc-classes"); check("CRC lists one row per class+subject (4 own + 2 other)", (await ev("document.querySelectorAll('#crc-table tbody tr').length")) === 6);
+check("CRC shows Class 10 English with 5 pending", await ev("[...document.querySelectorAll('#crc-table tbody tr')].some(r=>r.children[2].textContent==='10' && r.children[6].textContent.trim()==='5')"));
+const leaks2 = ["Ananya", "Kiran", "Rohit", "Neha", "BB-10", "BB-6", "Arjun", "Asha"].filter(w => crc2.includes(w));
+check("CRC still has no names or copy codes after adding classes", leaks2.length === 0, leaks2.join(", "));
+await click('[data-action="set-role"][data-role="school"]');
+check("statement from School view lists every class", (await ev("statementDoc()")).includes("English") && (await ev("statementDoc()")).includes("Maths"));
+await click('[data-action="open-reset"]'); await click('[data-action="reset-confirm"]');
+check("reset returns to Class 6 Science", (await ev("document.querySelector('#group-select').selectedOptions[0].textContent")).includes("Class 6"));
+
 console.log("\n# Languages");
-const english = ["Government books still pending", "Pass It On copies available", "Children without any physical copy", "Add a Book", "Give a Book", "Book Returned", "Govt Books Arrived", "Waiting", "Print monthly shortage statement", "Official Textbook Shortage", "Students entitled", "Longest pending", "Reset demo", "School only", "None"];
+const english = ["Government books still pending", "Pass It On copies available", "Children without any physical copy", "Add a Book", "Give a Book", "Book Returned", "Govt Books Arrived", "Waiting", "Print monthly shortage statement", "Official Textbook Shortage", "Students entitled", "Longest pending", "Reset demo", "School only", "None", "Add class / subject", "Edit numbers", "Add or remove children", "Names listed"];
 for (const lang of ["hi", "or", "mr", "en"]) {
   await pickLang(lang);
   const schoolTxt = await ev("document.body.innerText");

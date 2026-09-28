@@ -191,6 +191,7 @@ html:lang(en) .reg thead th{text-transform:uppercase;letter-spacing:.05em;font-s
 .st{font-weight:700;display:inline-flex;gap:6px;align-items:baseline}
 .st--wait{color:var(--amber)} .st--temp{color:var(--green)} .st--govt{color:var(--blue)} .st--due{color:var(--amber)}
 .flag{font-weight:800;font-variant-numeric:tabular-nums}
+#crc-table tbody th{white-space:nowrap}
 
 /* ---------- School-only records ---------- */
 .records{display:grid;grid-template-columns:1fr 1fr;gap:24px}
@@ -209,7 +210,7 @@ html:lang(en) .reg thead th{text-transform:uppercase;letter-spacing:.05em;font-s
 .btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
 /* ---------- CRC ---------- */
-.demand{display:flex;gap:18px;align-items:center;border:1.5px solid var(--blue);background:var(--blue-tint);padding:14px 18px}
+.demand{display:block;border:1.5px solid var(--blue);background:var(--blue-tint);padding:14px 18px}
 .demand__num{font-size:48px;font-weight:800;color:var(--blue);line-height:1;font-variant-numeric:tabular-nums}
 .demand__text{font-size:19px;font-weight:700}
 
@@ -276,6 +277,30 @@ legend{padding:0;margin-bottom:4px}
 .changes .arrow{color:var(--muted);padding:0 4px}
 .changes .same{font-size:14px;color:var(--muted);font-style:italic;margin-left:6px}
 .namelist{margin:6px 0 0;padding-left:20px}
+
+/* ---------- Class & subject bar, forms ---------- */
+.groupbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding-bottom:16px;margin-bottom:22px;border-bottom:1px dashed var(--rule-strong)}
+.groupbar label{font-weight:700;font-size:16px}
+.groupbar select{min-height:46px;min-width:240px;border:1.5px solid var(--ink);border-radius:var(--r);background:#fff;padding:6px 10px;font-size:17px;font-weight:700;color:var(--blue);cursor:pointer}
+.btn--small{min-height:44px;padding:8px 14px;font-size:15px}
+.listbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 12px}
+.namecount{font-weight:700}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-weight:700}
+.field input,.field select,.field textarea{min-height:46px;width:100%;border:1.5px solid var(--ink);border-radius:var(--r);background:#fff;padding:8px 10px;font-size:17px}
+.field textarea{min-height:110px;resize:vertical;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.checks{list-style:none;margin:8px 0 0;padding:0;border:1.5px solid var(--ink);background:#fff;max-height:250px;overflow:auto}
+.checks li+li{border-top:1px solid var(--rule)}
+.checks label{display:flex;align-items:center;gap:12px;min-height:50px;padding:6px 14px;cursor:pointer}
+.checks label:has(input:checked){background:var(--blue-tint)}
+.checks input{width:22px;height:22px;accent-color:var(--blue);flex:none;margin:0}
+.checks .who{font-weight:750}
+.checks .tag{font-size:14px;color:var(--green);font-weight:700;white-space:nowrap}
+.checks .when{margin-left:auto;color:var(--muted);white-space:nowrap}
+.demand-list{margin:0;padding-left:20px}
+.demand-list li{margin:4px 0;font-size:17px}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}.groupbar select{flex:1 1 100%;min-width:0}}
 
 /* ---------- Print documents (hidden on screen) ---------- */
 #print-root{display:none}
@@ -422,6 +447,24 @@ const LANGS = [
 ];
 const I18N = {
 en: {
+  groupLabel:"Class & subject", addGroup:"Add class / subject", editGroup:"Edit numbers", pendingN:"{n} pending",
+  groupTitleNew:"Add a class and subject", groupTitleEdit:"Edit class numbers", save:"Save",
+  fEntitled:"Students entitled (enrolled in this class)", fReceived:"Govt books already received", fLastYear:"Last year’s order (optional)",
+  receivedLocked:"Govt books received change only through “Govt Books Arrived”.",
+  groupExists:"This class and subject already exists.", numbersError:"Check the numbers: govt books received cannot be more than students entitled.",
+  entitledTooLow:"Students entitled is too low: {n} children are still on the waiting list.",
+  groupAdded:"Class added", groupAddedMsg:"{group}: {n} government books pending. Now add the children who have not received the book.", addChildrenNow:"Add children now",
+  manageList:"Add or remove children", listTitle:"Children who have not received the govt book", namesLabel:"Names or roll numbers — one per line",
+  sinceLabel:"Waiting since", sinceHint:"Usually the first day of the school session.", sinceFuture:"The date cannot be in the future.", addToList:"Add to waiting list",
+  namesCount:"Names listed: {named} of {pending} children still owed a govt book", namesMissing:"{n} more children are still owed a book but are not named yet. Add their names.",
+  tooMany:"Only {n} more names can be added — that is how many government books are pending. If a new child has joined, first raise “Students entitled” with Edit numbers.",
+  namesEmpty:"Type at least one name.", duplicateName:"Already on the list: {names}.", childrenAdded:"{n} children added to the waiting list.", logListed:"{n} children added to the waiting list",
+  onList:"On the list", removeBtn:"Remove", removeBlocked:"Collect copy {code} first", listEmpty:"No children on the list yet.",
+  whoGot:"Who received a government book?", whoGotHint:"The longest-waiting children are ticked first. Change the ticks if needed.",
+  tickError:"You ticked {k} children but recorded only {n} books.", handedTo:"Official books given to:",
+  shelfEmpty:"No copies yet. Use “Add a Book” when a family gives one.",
+  demandTextNoOld:"{n} students for this class — order from actual enrolment.", demandNote:"Order from actual enrolment, not last year’s estimate.",
+  english:"English", hindi:"Hindi", socialScience:"Social Science", evs:"EVS", odia:"Odia", marathi:"Marathi", sanskrit:"Sanskrit",
   sNo:"No.", ruleStamp:"Rule", privacyStamp:"Privacy", whereCol:"Where is it", whenCol:"When", entryCol:"Entry", localRecords:"School-only records", localRecordsNote:"Kept on this device. Never sent to CRC.",
   skip:"Skip to main content",
   viewLabel:"View", langLabel:"Language", school:"School", crc:"CRC / Block",
@@ -463,7 +506,7 @@ en: {
   crcPrivacy:"This view deliberately does not contain donated stock, temporary coverage, or borrower names.",
   schoolCol:"School", classCol:"Class", subjectCol:"Subject", entitledCol:"Students entitled", receivedCol:"Govt books received", pendingCol:"Govt books pending", longestCol:"Longest pending",
   total:"Total", complete:"Complete",
-  demandHeading:"Next-year demand signal", demandText:"{n} students for this class — not last year’s {old}.", demandWhere:"{school} · Class {cls} {subject}: order from actual enrolment.",
+  demandHeading:"Next-year demand signal", demandText:"{n} students for this class — not last year’s {old}.",
   monthLabel:"Month",
   close:"Close", cancel:"Cancel", done:"Done", becomes:"to", unchanged:"unchanged",
   addQ:"Is this the current edition of the textbook?", addHint:"Check the year/edition on the first pages. It must match this year’s government textbook.",
@@ -483,7 +526,7 @@ en: {
   govQ:"How many official government books arrived?", govHint:"Count only books sent by the government. Do not count donated books.",
   fewer:"One fewer", more:"One more", pendingBefore:"Pending before this delivery: {n}", qtyError:"Enter a number from 1 to {max}.",
   govBtn:"Record delivery", govDoneTitle:"Official delivery recorded",
-  handOut:"Give the official books to (longest waiting first):",
+ 
   recallTitle:"Temporary copies can now be recalled to the Book Bank.", openReturn:"Open Book Returned",
   bankSeparate:"The Book Bank stays a separate school resource. Its records are not changed.",
   nonePending:"No government books are pending for this class.",
@@ -499,6 +542,24 @@ en: {
   printedFrom:"Printed from the PASS IT ON prototype"
 },
 hi: {
+  groupLabel:"कक्षा और विषय", addGroup:"कक्षा / विषय जोड़ें", editGroup:"संख्याएँ बदलें", pendingN:"{n} बाकी",
+  groupTitleNew:"नई कक्षा और विषय जोड़ें", groupTitleEdit:"कक्षा की संख्याएँ बदलें", save:"सहेजें",
+  fEntitled:"हकदार विद्यार्थी (इस कक्षा में नामांकित)", fReceived:"पहले से मिली सरकारी किताबें", fLastYear:"पिछले साल का ऑर्डर (वैकल्पिक)",
+  receivedLocked:"मिली सरकारी किताबें केवल “सरकारी किताबें आईं” से बदलती हैं।",
+  groupExists:"यह कक्षा और विषय पहले से है।", numbersError:"संख्याएँ जाँचें: मिली सरकारी किताबें हकदार विद्यार्थियों से ज़्यादा नहीं हो सकतीं।",
+  entitledTooLow:"हकदार विद्यार्थी बहुत कम हैं: {n} बच्चे अभी इंतज़ार सूची में हैं।",
+  groupAdded:"कक्षा जोड़ी गई", groupAddedMsg:"{group}: {n} सरकारी किताबें बाकी। अब उन बच्चों को जोड़ें जिन्हें किताब नहीं मिली।", addChildrenNow:"अभी बच्चे जोड़ें",
+  manageList:"बच्चे जोड़ें या हटाएँ", listTitle:"जिन बच्चों को सरकारी किताब नहीं मिली", namesLabel:"नाम या रोल नंबर — हर पंक्ति में एक",
+  sinceLabel:"कब से इंतज़ार", sinceHint:"आमतौर पर स्कूल सत्र का पहला दिन।", sinceFuture:"तारीख भविष्य की नहीं हो सकती।", addToList:"इंतज़ार सूची में जोड़ें",
+  namesCount:"सूची में नाम: {pending} में से {named} (जिन्हें अभी सरकारी किताब मिलनी है)", namesMissing:"{n} और बच्चों को किताब मिलनी है, पर उनके नाम अभी सूची में नहीं हैं। उनके नाम जोड़ें।",
+  tooMany:"केवल {n} और नाम जोड़े जा सकते हैं — इतनी ही सरकारी किताबें बाकी हैं। अगर कोई नया बच्चा आया है, तो पहले “संख्याएँ बदलें” से हकदार विद्यार्थी बढ़ाएँ।",
+  namesEmpty:"कम से कम एक नाम लिखें।", duplicateName:"पहले से सूची में: {names}।", childrenAdded:"{n} बच्चे इंतज़ार सूची में जोड़े गए।", logListed:"{n} बच्चे इंतज़ार सूची में जोड़े गए",
+  onList:"सूची में", removeBtn:"हटाएँ", removeBlocked:"पहले प्रति {code} वापस लें", listEmpty:"सूची में अभी कोई बच्चा नहीं।",
+  whoGot:"किसे सरकारी किताब मिली?", whoGotHint:"सबसे लंबे इंतज़ार वाले बच्चे पहले से चुने हैं। ज़रूरत हो तो बदलें।",
+  tickError:"आपने {k} बच्चे चुने, पर केवल {n} किताबें दर्ज कीं।", handedTo:"सरकारी किताबें इन्हें दी गईं:",
+  shelfEmpty:"अभी कोई प्रति नहीं। जब कोई परिवार किताब दे, तो “किताब जमा करें” दबाएँ।",
+  demandTextNoOld:"इस कक्षा के लिए {n} विद्यार्थी — असली नामांकन से ऑर्डर करें।", demandNote:"पिछले साल के अनुमान से नहीं, असली नामांकन से ऑर्डर करें।",
+  english:"अंग्रेज़ी", hindi:"हिंदी", socialScience:"सामाजिक विज्ञान", evs:"पर्यावरण अध्ययन", odia:"ओड़िया", marathi:"मराठी", sanskrit:"संस्कृत",
   sNo:"क्र.", ruleStamp:"नियम", privacyStamp:"गोपनीयता", whereCol:"कहाँ है", whenCol:"कब", entryCol:"प्रविष्टि", localRecords:"केवल स्कूल के रिकॉर्ड", localRecordsNote:"इसी डिवाइस पर रहते हैं। CRC को कभी नहीं भेजे जाते।",
   skip:"मुख्य भाग पर जाएँ",
   viewLabel:"दृश्य", langLabel:"भाषा", school:"स्कूल", crc:"CRC / ब्लॉक",
@@ -540,7 +601,7 @@ hi: {
   crcPrivacy:"इस दृश्य में जानबूझकर दान की किताबें, अस्थायी मदद या उधार लेने वाले बच्चों के नाम नहीं हैं।",
   schoolCol:"स्कूल", classCol:"कक्षा", subjectCol:"विषय", entitledCol:"हकदार विद्यार्थी", receivedCol:"मिली सरकारी किताबें", pendingCol:"बाकी सरकारी किताबें", longestCol:"सबसे लंबा इंतज़ार",
   total:"कुल", complete:"पूरा",
-  demandHeading:"अगले साल की मांग का संकेत", demandText:"इस कक्षा के लिए {n} विद्यार्थी — पिछले साल के {old} नहीं।", demandWhere:"{school} · कक्षा {cls} {subject}: असली नामांकन के आधार पर ऑर्डर करें।",
+  demandHeading:"अगले साल की मांग का संकेत", demandText:"इस कक्षा के लिए {n} विद्यार्थी — पिछले साल के {old} नहीं।",
   monthLabel:"माह",
   close:"बंद करें", cancel:"रद्द करें", done:"ठीक है", becomes:"से", unchanged:"कोई बदलाव नहीं",
   addQ:"क्या यह पाठ्यपुस्तक का वर्तमान संस्करण है?", addHint:"पहले पन्नों पर वर्ष/संस्करण देखें। यह इस साल की सरकारी पाठ्यपुस्तक से मिलना चाहिए।",
@@ -560,7 +621,7 @@ hi: {
   govQ:"कितनी सरकारी किताबें आईं?", govHint:"केवल सरकार से आई किताबें गिनें। दान की किताबें न गिनें।",
   fewer:"एक कम", more:"एक ज़्यादा", pendingBefore:"इस डिलीवरी से पहले बाकी: {n}", qtyError:"1 से {max} तक की संख्या लिखें।",
   govBtn:"डिलीवरी दर्ज करें", govDoneTitle:"सरकारी डिलीवरी दर्ज हुई",
-  handOut:"सरकारी किताबें इन्हें दें (सबसे लंबा इंतज़ार पहले):",
+ 
   recallTitle:"अब अस्थायी किताबें पुस्तक बैंक में वापस ली जा सकती हैं।", openReturn:"“किताब वापस आई” खोलें",
   bankSeparate:"पुस्तक बैंक स्कूल का अलग संसाधन बना रहता है। उसके रिकॉर्ड नहीं बदलते।",
   nonePending:"इस कक्षा की कोई सरकारी किताब बाकी नहीं है।",
@@ -576,6 +637,24 @@ hi: {
   printedFrom:"PASS IT ON प्रोटोटाइप से प्रिंट"
 },
 or: {
+  groupLabel:"ଶ୍ରେଣୀ ଓ ବିଷୟ", addGroup:"ଶ୍ରେଣୀ / ବିଷୟ ଯୋଡ଼ନ୍ତୁ", editGroup:"ସଂଖ୍ୟା ବଦଳାନ୍ତୁ", pendingN:"{n} ବାକି",
+  groupTitleNew:"ନୂଆ ଶ୍ରେଣୀ ଓ ବିଷୟ ଯୋଡ଼ନ୍ତୁ", groupTitleEdit:"ଶ୍ରେଣୀର ସଂଖ୍ୟା ବଦଳାନ୍ତୁ", save:"ସେଭ କରନ୍ତୁ",
+  fEntitled:"ହକଦାର ଛାତ୍ରଛାତ୍ରୀ (ଏହି ଶ୍ରେଣୀରେ ନାମଲେଖା)", fReceived:"ପୂର୍ବରୁ ମିଳିଥିବା ସରକାରୀ ବହି", fLastYear:"ଗତ ବର୍ଷର ଅର୍ଡର (ବୈକଳ୍ପିକ)",
+  receivedLocked:"ମିଳିଥିବା ସରକାରୀ ବହି କେବଳ “ସରକାରୀ ବହି ଆସିଲା” ଦ୍ୱାରା ବଦଳେ।",
+  groupExists:"ଏହି ଶ୍ରେଣୀ ଓ ବିଷୟ ପୂର୍ବରୁ ଅଛି।", numbersError:"ସଂଖ୍ୟା ଯାଞ୍ଚ କରନ୍ତୁ: ମିଳିଥିବା ସରକାରୀ ବହି ହକଦାର ଛାତ୍ରଛାତ୍ରୀଙ୍କ ଠାରୁ ଅଧିକ ହୋଇପାରିବ ନାହିଁ।",
+  entitledTooLow:"ହକଦାର ଛାତ୍ରଛାତ୍ରୀ ସଂଖ୍ୟା ବହୁତ କମ: {n} ଜଣ ପିଲା ଏବେ ବି ଅପେକ୍ଷା ତାଲିକାରେ ଅଛନ୍ତି।",
+  groupAdded:"ଶ୍ରେଣୀ ଯୋଡ଼ାଗଲା", groupAddedMsg:"{group}: {n}ଟି ସରକାରୀ ବହି ବାକି। ଏବେ ବହି ପାଇନଥିବା ପିଲାଙ୍କୁ ଯୋଡ଼ନ୍ତୁ।", addChildrenNow:"ଏବେ ପିଲା ଯୋଡ଼ନ୍ତୁ",
+  manageList:"ପିଲା ଯୋଡ଼ନ୍ତୁ ବା ହଟାନ୍ତୁ", listTitle:"ଯେଉଁ ପିଲା ସରକାରୀ ବହି ପାଇନାହାନ୍ତି", namesLabel:"ନାମ କିମ୍ବା ରୋଲ ନମ୍ବର — ପ୍ରତି ଧାଡ଼ିରେ ଗୋଟିଏ",
+  sinceLabel:"କେବେଠାରୁ ଅପେକ୍ଷା", sinceHint:"ସାଧାରଣତଃ ସ୍କୁଲ ସତ୍ରର ପ୍ରଥମ ଦିନ।", sinceFuture:"ତାରିଖ ଭବିଷ୍ୟତର ହୋଇପାରିବ ନାହିଁ।", addToList:"ଅପେକ୍ଷା ତାଲିକାରେ ଯୋଡ଼ନ୍ତୁ",
+  namesCount:"ତାଲିକାରେ ନାମ: {pending} ମଧ୍ୟରୁ {named} (ଯେଉଁମାନଙ୍କୁ ସରକାରୀ ବହି ମିଳିବା ବାକି)", namesMissing:"ଆଉ {n} ଜଣ ପିଲାଙ୍କୁ ବହି ମିଳିବା ବାକି, କିନ୍ତୁ ସେମାନଙ୍କ ନାମ ଏପର୍ଯ୍ୟନ୍ତ ତାଲିକାରେ ନାହିଁ। ସେମାନଙ୍କ ନାମ ଯୋଡ଼ନ୍ତୁ।",
+  tooMany:"କେବଳ ଆଉ {n}ଟି ନାମ ଯୋଡ଼ିହେବ — ଏତିକି ସରକାରୀ ବହି ବାକି ଅଛି। ନୂଆ ପିଲା ଆସିଥିଲେ, ପ୍ରଥମେ “ସଂଖ୍ୟା ବଦଳାନ୍ତୁ”ରେ ହକଦାର ଛାତ୍ରଛାତ୍ରୀ ବଢ଼ାନ୍ତୁ।",
+  namesEmpty:"ଅତି କମରେ ଗୋଟିଏ ନାମ ଲେଖନ୍ତୁ।", duplicateName:"ପୂର୍ବରୁ ତାଲିକାରେ ଅଛି: {names}।", childrenAdded:"{n} ଜଣ ପିଲା ଅପେକ୍ଷା ତାଲିକାରେ ଯୋଡ଼ାଗଲେ।", logListed:"{n} ଜଣ ପିଲା ଅପେକ୍ଷା ତାଲିକାରେ ଯୋଡ଼ାଗଲେ",
+  onList:"ତାଲିକାରେ", removeBtn:"ହଟାନ୍ତୁ", removeBlocked:"ପ୍ରଥମେ ପ୍ରତି {code} ଫେରାଇ ନିଅନ୍ତୁ", listEmpty:"ତାଲିକାରେ ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ପିଲା ନାହିଁ।",
+  whoGot:"କିଏ ସରକାରୀ ବହି ପାଇଲେ?", whoGotHint:"ଅଧିକ ଦିନ ଅପେକ୍ଷା କରିଥିବା ପିଲା ପ୍ରଥମେ ବଛାଯାଇଛନ୍ତି। ଦରକାର ହେଲେ ବଦଳାନ୍ତୁ।",
+  tickError:"ଆପଣ {k} ଜଣ ପିଲା ବାଛିଛନ୍ତି, କିନ୍ତୁ କେବଳ {n}ଟି ବହି ଲେଖିଛନ୍ତି।", handedTo:"ସରକାରୀ ବହି ଏମାନଙ୍କୁ ଦିଆଗଲା:",
+  shelfEmpty:"ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ପ୍ରତି ନାହିଁ। କୌଣସି ପରିବାର ବହି ଦେଲେ “ବହି ଜମା କରନ୍ତୁ” ଦବାନ୍ତୁ।",
+  demandTextNoOld:"ଏହି ଶ୍ରେଣୀ ପାଇଁ {n} ଜଣ ଛାତ୍ରଛାତ୍ରୀ — ପ୍ରକୃତ ନାମଲେଖା ଅନୁସାରେ ଅର୍ଡର କରନ୍ତୁ।", demandNote:"ଗତ ବର୍ଷର ଅନୁମାନରୁ ନୁହେଁ, ପ୍ରକୃତ ନାମଲେଖାରୁ ଅର୍ଡର କରନ୍ତୁ।",
+  english:"ଇଂରାଜୀ", hindi:"ହିନ୍ଦୀ", socialScience:"ସାମାଜିକ ବିଜ୍ଞାନ", evs:"ପରିବେଶ ଅଧ୍ୟୟନ", odia:"ଓଡ଼ିଆ", marathi:"ମରାଠୀ", sanskrit:"ସଂସ୍କୃତ",
   sNo:"କ୍ର.", ruleStamp:"ନିୟମ", privacyStamp:"ଗୋପନୀୟତା", whereCol:"କେଉଁଠି ଅଛି", whenCol:"କେବେ", entryCol:"ଲେଖା", localRecords:"କେବଳ ସ୍କୁଲର ରେକର୍ଡ", localRecordsNote:"ଏହି ଡିଭାଇସରେ ରହେ। CRCକୁ କେବେ ପଠାଯାଏ ନାହିଁ।",
   skip:"ମୁଖ୍ୟ ଅଂଶକୁ ଯାଆନ୍ତୁ",
   viewLabel:"ଦୃଶ୍ୟ", langLabel:"ଭାଷା", school:"ସ୍କୁଲ", crc:"CRC / ବ୍ଲକ",
@@ -617,7 +696,7 @@ or: {
   crcPrivacy:"ଏହି ଦୃଶ୍ୟରେ ଜାଣିଶୁଣି ଦାନ ବହି, ଅସ୍ଥାୟୀ ସହାୟତା କିମ୍ବା ଧାର ନେଇଥିବା ପିଲାଙ୍କ ନାମ ରଖାଯାଇନାହିଁ।",
   schoolCol:"ସ୍କୁଲ", classCol:"ଶ୍ରେଣୀ", subjectCol:"ବିଷୟ", entitledCol:"ହକଦାର ଛାତ୍ରଛାତ୍ରୀ", receivedCol:"ମିଳିଥିବା ସରକାରୀ ବହି", pendingCol:"ବାକି ସରକାରୀ ବହି", longestCol:"ସବୁଠାରୁ ଲମ୍ବା ଅପେକ୍ଷା",
   total:"ମୋଟ", complete:"ସମ୍ପୂର୍ଣ୍ଣ",
-  demandHeading:"ଆସନ୍ତା ବର୍ଷର ଚାହିଦା ସଙ୍କେତ", demandText:"ଏହି ଶ୍ରେଣୀ ପାଇଁ {n} ଜଣ ଛାତ୍ରଛାତ୍ରୀ — ଗତ ବର୍ଷର {old} ନୁହେଁ।", demandWhere:"{school} · ଶ୍ରେଣୀ {cls} {subject}: ପ୍ରକୃତ ନାମଲେଖା ଅନୁସାରେ ଅର୍ଡର କରନ୍ତୁ।",
+  demandHeading:"ଆସନ୍ତା ବର୍ଷର ଚାହିଦା ସଙ୍କେତ", demandText:"ଏହି ଶ୍ରେଣୀ ପାଇଁ {n} ଜଣ ଛାତ୍ରଛାତ୍ରୀ — ଗତ ବର୍ଷର {old} ନୁହେଁ।",
   monthLabel:"ମାସ",
   close:"ବନ୍ଦ କରନ୍ତୁ", cancel:"ବାତିଲ କରନ୍ତୁ", done:"ଠିକ ଅଛି", becomes:"ରୁ", unchanged:"କୌଣସି ପରିବର୍ତ୍ତନ ନାହିଁ",
   addQ:"ଏହା କ’ଣ ପାଠ୍ୟପୁସ୍ତକର ଚଳିତ ସଂସ୍କରଣ?", addHint:"ପ୍ରଥମ ପୃଷ୍ଠାରେ ବର୍ଷ/ସଂସ୍କରଣ ଦେଖନ୍ତୁ। ଏହା ଚଳିତ ବର୍ଷର ସରକାରୀ ପାଠ୍ୟପୁସ୍ତକ ସହ ମେଳ ଖାଇବା ଦରକାର।",
@@ -637,7 +716,7 @@ or: {
   govQ:"କେତୋଟି ସରକାରୀ ବହି ଆସିଲା?", govHint:"କେବଳ ସରକାରଙ୍କ ପଠାଯାଇଥିବା ବହି ଗଣନ୍ତୁ। ଦାନ ବହି ଗଣନ୍ତୁ ନାହିଁ।",
   fewer:"ଗୋଟିଏ କମ", more:"ଗୋଟିଏ ଅଧିକ", pendingBefore:"ଏହି ଯୋଗାଣ ପୂର୍ବରୁ ବାକି: {n}", qtyError:"1 ରୁ {max} ମଧ୍ୟରେ ଏକ ସଂଖ୍ୟା ଲେଖନ୍ତୁ।",
   govBtn:"ଯୋଗାଣ ଲେଖନ୍ତୁ", govDoneTitle:"ସରକାରୀ ଯୋଗାଣ ଲେଖାଗଲା",
-  handOut:"ସରକାରୀ ବହି ଏମାନଙ୍କୁ ଦିଅନ୍ତୁ (ଅଧିକ ଅପେକ୍ଷା ଆଗରେ):",
+ 
   recallTitle:"ଏବେ ଅସ୍ଥାୟୀ ବହିଗୁଡ଼ିକୁ ବହି ବ୍ୟାଙ୍କକୁ ଫେରାଇ ଆଣିପାରିବେ।", openReturn:"“ବହି ଫେରିଲା” ଖୋଲନ୍ତୁ",
   bankSeparate:"ବହି ବ୍ୟାଙ୍କ ସ୍କୁଲର ଅଲଗା ସମ୍ବଳ ଭାବେ ରହେ। ଏହାର ରେକର୍ଡ ବଦଳେ ନାହିଁ।",
   nonePending:"ଏହି ଶ୍ରେଣୀର କୌଣସି ସରକାରୀ ବହି ବାକି ନାହିଁ।",
@@ -653,6 +732,24 @@ or: {
   printedFrom:"PASS IT ON ପ୍ରୋଟୋଟାଇପରୁ ପ୍ରିଣ୍ଟ"
 },
 mr: {
+  groupLabel:"इयत्ता आणि विषय", addGroup:"इयत्ता / विषय जोडा", editGroup:"संख्या बदला", pendingN:"{n} बाकी",
+  groupTitleNew:"नवीन इयत्ता आणि विषय जोडा", groupTitleEdit:"इयत्तेची संख्या बदला", save:"जतन करा",
+  fEntitled:"हक्कदार विद्यार्थी (या इयत्तेत पटावर)", fReceived:"आधीच मिळालेली सरकारी पुस्तके", fLastYear:"मागील वर्षाची मागणी (ऐच्छिक)",
+  receivedLocked:"मिळालेली सरकारी पुस्तके फक्त “सरकारी पुस्तके आली” मधूनच बदलतात.",
+  groupExists:"ही इयत्ता आणि विषय आधीच आहे.", numbersError:"संख्या तपासा: मिळालेली सरकारी पुस्तके हक्कदार विद्यार्थ्यांपेक्षा जास्त असू शकत नाहीत.",
+  entitledTooLow:"हक्कदार विद्यार्थी संख्या खूप कमी आहे: {n} मुले अजून प्रतीक्षा यादीत आहेत.",
+  groupAdded:"इयत्ता जोडली", groupAddedMsg:"{group}: {n} सरकारी पुस्तके बाकी. आता ज्यांना पुस्तक मिळाले नाही त्या मुलांची नावे जोडा.", addChildrenNow:"आता मुले जोडा",
+  manageList:"मुले जोडा किंवा काढा", listTitle:"ज्यांना सरकारी पुस्तक मिळाले नाही अशी मुले", namesLabel:"नावे किंवा हजेरी क्रमांक — प्रत्येक ओळीत एक",
+  sinceLabel:"केव्हापासून प्रतीक्षा", sinceHint:"सहसा शाळेच्या सत्राचा पहिला दिवस.", sinceFuture:"तारीख भविष्यातील असू शकत नाही.", addToList:"प्रतीक्षा यादीत जोडा",
+  namesCount:"यादीतील नावे: {pending} पैकी {named} (ज्यांना सरकारी पुस्तक मिळायचे आहे)", namesMissing:"आणखी {n} मुलांना पुस्तक मिळायचे आहे, पण त्यांची नावे अजून यादीत नाहीत. त्यांची नावे जोडा.",
+  tooMany:"फक्त आणखी {n} नावे जोडता येतील — इतकीच सरकारी पुस्तके बाकी आहेत. नवीन मूल आले असेल तर आधी “संख्या बदला” मधून हक्कदार विद्यार्थी वाढवा.",
+  namesEmpty:"किमान एक नाव लिहा.", duplicateName:"आधीच यादीत: {names}.", childrenAdded:"{n} मुले प्रतीक्षा यादीत जोडली.", logListed:"{n} मुले प्रतीक्षा यादीत जोडली",
+  onList:"यादीत", removeBtn:"काढा", removeBlocked:"आधी प्रत {code} परत घ्या", listEmpty:"यादीत अजून कोणतेही मूल नाही.",
+  whoGot:"कोणाला सरकारी पुस्तक मिळाले?", whoGotHint:"सर्वात जास्त प्रतीक्षेतील मुले आधीच निवडली आहेत. गरज असल्यास बदला.",
+  tickError:"तुम्ही {k} मुले निवडली, पण फक्त {n} पुस्तके नोंदवली.", handedTo:"सरकारी पुस्तके यांना दिली:",
+  shelfEmpty:"अजून एकही प्रत नाही. एखाद्या कुटुंबाने पुस्तक दिल्यावर “पुस्तक जमा करा” दाबा.",
+  demandTextNoOld:"या इयत्तेसाठी {n} विद्यार्थी — प्रत्यक्ष पटसंख्येनुसार मागणी करा.", demandNote:"मागील वर्षाच्या अंदाजावरून नव्हे, प्रत्यक्ष पटसंख्येवरून मागणी करा.",
+  english:"इंग्रजी", hindi:"हिंदी", socialScience:"सामाजिक शास्त्र", evs:"परिसर अभ्यास", odia:"ओडिया", marathi:"मराठी", sanskrit:"संस्कृत",
   sNo:"क्र.", ruleStamp:"नियम", privacyStamp:"गोपनीयता", whereCol:"कुठे आहे", whenCol:"केव्हा", entryCol:"नोंद", localRecords:"फक्त शाळेच्या नोंदी", localRecordsNote:"याच डिव्हाइसवर राहतात. CRC ला कधीच पाठवल्या जात नाहीत.",
   skip:"मुख्य भागाकडे जा",
   viewLabel:"दृश्य", langLabel:"भाषा", school:"शाळा", crc:"CRC / ब्लॉक",
@@ -694,7 +791,7 @@ mr: {
   crcPrivacy:"या दृश्यात जाणीवपूर्वक दान केलेली पुस्तके, तात्पुरती मदत किंवा उसने घेणाऱ्या मुलांची नावे नाहीत.",
   schoolCol:"शाळा", classCol:"इयत्ता", subjectCol:"विषय", entitledCol:"हक्कदार विद्यार्थी", receivedCol:"मिळालेली सरकारी पुस्तके", pendingCol:"बाकी सरकारी पुस्तके", longestCol:"सर्वात जास्त प्रतीक्षा",
   total:"एकूण", complete:"पूर्ण",
-  demandHeading:"पुढील वर्षाच्या मागणीचा संकेत", demandText:"या इयत्तेसाठी {n} विद्यार्थी — मागील वर्षाचे {old} नाहीत.", demandWhere:"{school} · इयत्ता {cls} {subject}: प्रत्यक्ष पटसंख्येनुसार मागणी करा.",
+  demandHeading:"पुढील वर्षाच्या मागणीचा संकेत", demandText:"या इयत्तेसाठी {n} विद्यार्थी — मागील वर्षाचे {old} नाहीत.",
   monthLabel:"महिना",
   close:"बंद करा", cancel:"रद्द करा", done:"ठीक आहे", becomes:"वरून", unchanged:"बदल नाही",
   addQ:"हे पाठ्यपुस्तक चालू आवृत्तीचे आहे का?", addHint:"पहिल्या पानांवरील वर्ष/आवृत्ती तपासा. ती या वर्षीच्या सरकारी पाठ्यपुस्तकाशी जुळली पाहिजे.",
@@ -714,7 +811,7 @@ mr: {
   govQ:"किती अधिकृत सरकारी पुस्तके आली?", govHint:"फक्त सरकारकडून आलेली पुस्तके मोजा. दान केलेली पुस्तके मोजू नका.",
   fewer:"एक कमी", more:"एक जास्त", pendingBefore:"या पुरवठ्यापूर्वी बाकी: {n}", qtyError:"1 ते {max} पर्यंतची संख्या लिहा.",
   govBtn:"पुरवठा नोंदवा", govDoneTitle:"अधिकृत पुरवठा नोंदवला",
-  handOut:"सरकारी पुस्तके यांना द्या (सर्वात जास्त प्रतीक्षा आधी):",
+ 
   recallTitle:"आता तात्पुरती पुस्तके पुस्तक बँकेत परत मागवता येतील.", openReturn:"“पुस्तक परत आले” उघडा",
   bankSeparate:"पुस्तक बँक शाळेचे स्वतंत्र साधन राहते. तिच्या नोंदी बदलत नाहीत.",
   nonePending:"या इयत्तेची कोणतीही सरकारी पुस्तके बाकी नाहीत.",
@@ -733,31 +830,64 @@ mr: {
 const localeOf = code => (LANGS.find(l => l.code === code) || LANGS[0]).locale;
 
 /* ==========================================================================
-   2. Demo data (illustrative Class 6 Science case from the spec)
+   2. Classes, subjects and demo data
+      Each class + subject is its own register: its own official figures,
+      waiting list and Book Bank shelf (a Class 6 Science copy can only be
+      lent to a Class 6 Science child).
    ========================================================================== */
-const SCHOOL = Object.freeze({ name:"Govt School A", cls:"6", subjectKey:"science", cluster:"Demo Cluster, Demo Block", codePrefix:"BB-6-SCI-" });
+const SCHOOL = Object.freeze({ name:"Govt School A", cluster:"Demo Cluster, Demo Block" });
+const SUBJECTS = Object.freeze([
+  { key:"science", code:"SCI" }, { key:"maths", code:"MAT" }, { key:"english", code:"ENG" },
+  { key:"hindi", code:"HIN" }, { key:"socialScience", code:"SST" }, { key:"evs", code:"EVS" },
+  { key:"odia", code:"ODI" }, { key:"marathi", code:"MAR" }, { key:"sanskrit", code:"SAN" }
+]);
+const CLASSES = Array.from({ length:12 }, (_, i) => String(i + 1));
 // Other schools' rows exist only as official figures — a CRC never receives Book Bank data from any school.
 const OTHER_SCHOOLS = Object.freeze([
   { school:"Govt School B", cls:"6", subjectKey:"science", entitled:42, received:42, longest:0 },
   { school:"Govt School C", cls:"9", subjectKey:"maths",   entitled:47, received:43, longest:18 }
 ]);
-const DATA_KEY = "passiton.v2.data";
-const PREFS_KEY = "passiton.v2.prefs";
+const DATA_KEY = "passiton.v3.data";
+const PREFS_KEY = "passiton.v3.prefs";
+const MAX_NAME = 60;
+
+const DAY_MS = 864e5;
+const toISODate = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function today(){ const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+function isoDaysAgo(n){ const d = today(); d.setDate(d.getDate() - n); return toISODate(d); }
+function daysSince(iso){
+  const [y, m, d] = iso.split("-").map(Number);
+  return Math.max(0, Math.round((today() - new Date(y, m - 1, d)) / DAY_MS));
+}
+// Most state-board sessions start in June; the teacher can change the date.
+function sessionStart(){ const now = new Date(); return `${now.getMonth() >= 5 ? now.getFullYear() : now.getFullYear() - 1}-06-01`; }
+
+const subjectCode = key => (SUBJECTS.find(s => s.key === key) || { code:"GEN" }).code;
+const subjectIndex = key => SUBJECTS.findIndex(s => s.key === key);
+const copyCode = (g, n) => `BB-${g.cls}-${subjectCode(g.subjectKey)}-${String(n).padStart(3, "0")}`;
+
+function newGroup(d, { cls, subjectKey, entitled, govtReceived, lastYearOrder = null }){
+  const g = { id:"g" + d.nextId++, cls, subjectKey, entitled, govtReceived, lastYearOrder, students:[], copies:[], nextCopy:1, log:[] };
+  d.groups.push(g);
+  return g;
+}
+function addStudent(d, g, name, since){ g.students.push({ id:"s" + d.nextId++, name, since, govt:false }); }
+function addCopy(g){ const code = copyCode(g, g.nextCopy++); g.copies.push({ code, holder:null }); return code; }
 
 function freshData(){
-  const names = [["Asha",31],["Ravi",26],["Meena",22],["Salim",18],["Pooja",16],["Bikash",14],["Rani",12],["Imran",9],["Sunita",7],["Gopal",5]];
-  return {
-    v: 2,
-    entitled: 60,          // students entitled to a government textbook (actual enrolment)
-    govtReceived: 50,      // official government books received — the ONLY thing that closes the shortage
-    lastYearOrder: 30,
-    students: names.map(([name, days], i) => ({ id:"s" + (i + 1), name, days, govt:false })),
-    copies: Array.from({ length:7 }, (_, i) => ({ code: copyCode(i + 1), holder:null })), // school-local Book Bank
-    nextCopy: 8,
-    log: []
-  };
+  const d = { v:3, nextId:1, groups:[] };
+  // The mandatory demo case from the spec.
+  const g6 = newGroup(d, { cls:"6", subjectKey:"science", entitled:60, govtReceived:50, lastYearOrder:30 });
+  [["Asha",31],["Ravi",26],["Meena",22],["Salim",18],["Pooja",16],["Bikash",14],["Rani",12],["Imran",9],["Sunita",7],["Gopal",5]]
+    .forEach(([name, days]) => addStudent(d, g6, name, isoDaysAgo(days)));
+  for (let i = 0; i < 7; i++) addCopy(g6);
+  const g7 = newGroup(d, { cls:"7", subjectKey:"maths", entitled:52, govtReceived:48, lastYearOrder:50 });
+  [["Arjun",20],["Kavya",15],["Deepak",11],["Fatima",6]].forEach(([name, days]) => addStudent(d, g7, name, isoDaysAgo(days)));
+  for (let i = 0; i < 3; i++) addCopy(g7);
+  const g8 = newGroup(d, { cls:"8", subjectKey:"english", entitled:45, govtReceived:45, lastYearOrder:45 });
+  for (let i = 0; i < 2; i++) addCopy(g8);
+  return d;
 }
-function copyCode(n){ return SCHOOL.codePrefix + String(n).padStart(3, "0"); }
 
 /* ==========================================================================
    3. Storage (localStorage, guarded — the app still runs if it is blocked)
@@ -767,57 +897,58 @@ const store = {
   set(key, value){ try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage blocked: keep working in memory */ } }
 };
 function isValidData(d){
-  return !!d && d.v === 2 && Number.isFinite(d.entitled) && Number.isFinite(d.govtReceived) &&
-    Array.isArray(d.students) && Array.isArray(d.copies) && Array.isArray(d.log) && Number.isInteger(d.nextCopy);
+  return !!d && d.v === 3 && Number.isInteger(d.nextId) && Array.isArray(d.groups) && d.groups.length > 0 &&
+    d.groups.every(g => Number.isFinite(g.entitled) && Number.isFinite(g.govtReceived) && Array.isArray(g.students) &&
+      Array.isArray(g.copies) && Array.isArray(g.log) && Number.isInteger(g.nextCopy));
 }
 function loadPrefs(){
   const p = store.get(PREFS_KEY) || {};
-  return { lang: I18N[p.lang] ? p.lang : "en", role: p.role === "crc" ? "crc" : "school" };
+  return { lang: I18N[p.lang] ? p.lang : "en", role: p.role === "crc" ? "crc" : "school", group: typeof p.group === "string" ? p.group : null };
 }
 let prefs = loadPrefs();
 let data = (() => { const d = store.get(DATA_KEY); return isValidData(d) ? d : freshData(); })();
 const savePrefs = () => store.set(PREFS_KEY, prefs);
 const saveData = () => store.set(DATA_KEY, data);
 
+const sortedGroups = () => [...data.groups].sort((a, b) => Number(a.cls) - Number(b.cls) || subjectIndex(a.subjectKey) - subjectIndex(b.subjectKey));
+function currentGroup(){ return data.groups.find(g => g.id === prefs.group) || sortedGroups()[0]; }
+
 /* ==========================================================================
    4. Calculations
    ========================================================================== */
 
-// OFFICIAL figures. Used by the school's official figure, the CRC view and the printed statement.
-// Deliberately reads ONLY enrolment, official receipts and waiting days — never data.copies.
-function officialSchoolRow(){
-  const pending = Math.max(0, data.entitled - data.govtReceived);
-  const waitingDays = data.students.filter(s => !s.govt).map(s => s.days);
+// OFFICIAL figures for one class + subject. Used by the school's official figure, the CRC view
+// and the printed statement. Reads ONLY enrolment, official receipts and waiting dates — never g.copies.
+function officialRowFor(g){
+  const pending = Math.max(0, g.entitled - g.govtReceived);
+  const waiting = g.students.filter(s => !s.govt).map(s => daysSince(s.since));
   return {
-    school: SCHOOL.name, cls: SCHOOL.cls, subjectKey: SCHOOL.subjectKey,
-    entitled: data.entitled, received: data.govtReceived, pending,
-    longest: pending > 0 && waitingDays.length ? Math.max(...waitingDays) : 0
+    school: SCHOOL.name, cls: g.cls, subjectKey: g.subjectKey,
+    entitled: g.entitled, received: g.govtReceived, pending, lastYearOrder: g.lastYearOrder,
+    longest: pending === 0 ? 0 : (waiting.length ? Math.max(...waiting) : null)   // null = names not listed yet
   };
 }
-function officialRows(){
-  return [officialSchoolRow(), ...OTHER_SCHOOLS.map(r => ({ ...r, pending: Math.max(0, r.entitled - r.received) }))];
-}
+const ownRows = () => sortedGroups().map(officialRowFor);
+const officialRows = () => [...ownRows(), ...OTHER_SCHOOLS.map(r => ({ ...r, pending: Math.max(0, r.entitled - r.received) }))];
 
 // SCHOOL-LOCAL learning-continuity figures. Never passed to the CRC view or the printed statement.
-function studentById(id){ return data.students.find(s => s.id === id); }
-function copyOf(student){ return data.copies.find(c => c.holder === student.id) || null; }
-function localFigures(){
-  const onShelf = data.copies.filter(c => !c.holder);
-  const lent = data.copies.filter(c => c.holder);
+const studentById = (g, id) => g.students.find(s => s.id === id);
+const copyOf = (g, s) => g.copies.find(c => c.holder === s.id) || null;
+function localFigures(g){
+  const lent = g.copies.filter(c => c.holder);
   // A temporary copy only fills today's gap while the child is still owed their government book.
-  const covering = lent.filter(c => !studentById(c.holder).govt).length;
-  const pending = officialSchoolRow().pending;
+  const covering = lent.filter(c => !studentById(g, c.holder).govt).length;
   return {
-    available: onShelf.length, lent: lent.length, covering,
-    noPhysical: Math.max(0, pending - covering),
-    recallDue: lent.filter(c => studentById(c.holder).govt)
+    available: g.copies.length - lent.length, lent: lent.length, covering,
+    noPhysical: Math.max(0, officialRowFor(g).pending - covering)
   };
 }
-function snapshot(){
-  const o = officialSchoolRow(), l = localFigures();
+function snapshot(g){
+  const o = officialRowFor(g), l = localFigures(g);
   return { pending:o.pending, received:o.received, available:l.available, noPhysical:l.noPhysical };
 }
-const byLongestWait = (a, b) => b.days - a.days || a.name.localeCompare(b.name);
+const namedWaiting = g => g.students.filter(s => !s.govt).length;
+const byLongestWait = (a, b) => a.since.localeCompare(b.since) || a.name.localeCompare(b.name);
 
 /* ==========================================================================
    5. Helpers
@@ -835,8 +966,9 @@ function th(key, params){
   for (const k in (params || {})) out = out.split("\u0000" + k + "\u0001").join("<strong>" + esc(params[k]) + "</strong>");
   return out;
 }
-const days = n => t("days", { n });
+const days = n => n === null ? "—" : t("days", { n });
 const subject = key => t(key);
+const groupLabel = g => `${t("classN", { n:g.cls })} · ${subject(g.subjectKey)}`;
 function monthName(){
   try { return new Intl.DateTimeFormat(localeOf(prefs.lang), { month:"long", year:"numeric" }).format(new Date()); }
   catch { return new Intl.DateTimeFormat("en-IN", { month:"long", year:"numeric" }).format(new Date()); }
@@ -846,7 +978,7 @@ function timeLabel(iso){
   catch { return ""; }
 }
 function announce(msg){ const live = $("#live"); live.textContent = ""; setTimeout(() => { live.textContent = msg; }, 30); }
-function addLog(k, p){ data.log.unshift({ k, p, at:new Date().toISOString() }); data.log.length = Math.min(data.log.length, 40); }
+function addLog(g, k, p){ g.log.unshift({ k, p, at:new Date().toISOString() }); g.log.length = Math.min(g.log.length, 40); }
 
 /* ==========================================================================
    6. Rendering
@@ -869,8 +1001,9 @@ function render(){
 }
 
 function markChangedFigures(){
-  const now = snapshot();
-  if (ui.shown) {
+  const g = currentGroup();
+  const now = { group:g.id, ...snapshot(g) };
+  if (ui.shown && ui.shown.group === now.group) {
     ["pending", "available", "noPhysical"].forEach(key => {
       if (ui.shown[key] !== now[key]) document.querySelector(`[data-stat="${key}"]`)?.classList.add("is-changed");
     });
@@ -881,18 +1014,34 @@ function markChangedFigures(){
 const sectionHead = (id, title, aside = "", asideClass = "") =>
   `<div class="sec-h"><h2 id="${id}">${esc(title)}</h2>${aside ? `<span class="aside ${asideClass}">${esc(aside)}</span>` : ""}</div>`;
 
+function groupBar(g){
+  const options = sortedGroups().map(x => {
+    const p = officialRowFor(x).pending;
+    return `<option value="${esc(x.id)}" ${x.id === g.id ? "selected" : ""}>${esc(groupLabel(x))} — ${esc(p ? t("pendingN", { n:p }) : t("complete"))}</option>`;
+  }).join("");
+  return `<div class="groupbar">
+    <label for="group-select">${esc(t("groupLabel"))}</label>
+    <select id="group-select">${options}</select>
+    <button type="button" class="btn btn--small" data-action="open-group-new">+ ${esc(t("addGroup"))}</button>
+    <button type="button" class="btn btn--small btn--link" data-action="open-group-edit">${esc(t("editGroup"))}</button>
+  </div>`;
+}
+
 function schoolView(){
-  const o = officialSchoolRow(), l = localFigures();
+  const g = currentGroup();
+  const o = officialRowFor(g), l = localFigures(g);
+  const named = namedWaiting(g), missing = Math.max(0, o.pending - named);
   return `
   <div class="sheet">
+    ${groupBar(g)}
     <section class="title" aria-labelledby="hero-h">
-      <p class="kicker">${esc(SCHOOL.name)} · ${esc(t("classN", { n:SCHOOL.cls }))} · ${esc(subject(SCHOOL.subjectKey))}</p>
+      <p class="kicker">${esc(SCHOOL.name)} · ${esc(groupLabel(g))}</p>
       <h1 id="hero-h"><span>${esc(t("heroA"))}</span><span class="h1b">${esc(t("heroB"))}</span></h1>
       <div class="stamp" role="note"><span class="stamp__label">${esc(t("ruleStamp"))}</span><p class="stamp__text">${esc(t("rule"))}</p></div>
     </section>
 
     <section class="sec" aria-labelledby="counts-h">
-      ${sectionHead("counts-h", t("countsHeading"))}
+      ${sectionHead("counts-h", `${t("countsHeading")} · ${groupLabel(g)}`)}
       <div class="ledger">
         <div class="ledger__cell ledger__cell--official" data-stat="pending">
           <span class="ledger__who c-red"><span class="mk bg-red" aria-hidden="true"></span>${esc(t("cardPendingTag"))}</span>
@@ -949,23 +1098,27 @@ function schoolView(){
     </section>
 
     <section class="sec" aria-labelledby="wait-h">
-      ${sectionHead("wait-h", `${t("waitHeading")} · ${t("classN", { n:SCHOOL.cls })} ${subject(SCHOOL.subjectKey)}`,
-        t("waitCount", { n:data.students.filter(s => !s.govt).length }), "aside--wait")}
+      ${sectionHead("wait-h", `${t("waitHeading")} · ${groupLabel(g)}`, t("waitCount", { n:named }), "aside--wait")}
       <p class="sec-note">${esc(t("waitNote"))}</p>
-      <div class="table-wrap">${waitingTable()}</div>
+      <div class="listbar">
+        <span class="namecount">${esc(t("namesCount", { named, pending:o.pending }))}</span>
+        <button type="button" class="btn btn--small" data-action="open-list">${esc(t("manageList"))}</button>
+      </div>
+      ${missing > 0 ? note("wait", esc(t("namesMissing", { n:missing }))) : ""}
+      ${g.students.length ? `<div class="table-wrap">${waitingTable(g)}</div>` : `<p class="muted">${esc(t("listEmpty"))}</p>`}
     </section>
 
     <section class="sec" aria-labelledby="records-h">
       ${sectionHead("records-h", t("localRecords"), t("localRecordsNote"), "aside--local")}
       <div class="records">
         <div>
-          <h3>${esc(t("shelfHeading"))}</h3>
+          <h3>${esc(t("shelfHeading"))} · ${esc(groupLabel(g))}</h3>
           <p class="sec-note" style="margin:0 0 8px">${esc(t("shelfNote"))}</p>
-          ${shelfTable()}
+          ${g.copies.length ? shelfTable(g) : `<p class="muted">${esc(t("shelfEmpty"))}</p>`}
         </div>
         <div>
           <h3>${esc(t("logHeading"))}</h3>
-          ${logTable()}
+          ${logTable(g)}
         </div>
       </div>
     </section>
@@ -994,22 +1147,22 @@ function actionButton(action, icon, titleKey, subKey, extra = ""){
 }
 
 // Status is shown with a distinct symbol AND words, never colour alone.
-function statusMark(s){
-  const copy = copyOf(s);
+function statusMark(g, s){
+  const copy = copyOf(g, s);
   if (s.govt && copy) return `<span class="st st--due"><span aria-hidden="true">↩</span>${esc(t("stReturn"))}</span>`;
   if (s.govt)         return `<span class="st st--govt"><span aria-hidden="true">✓</span>${esc(t("stGovt"))}</span>`;
   if (copy)           return `<span class="st st--temp"><span aria-hidden="true">◐</span>${esc(t("stTemp"))}</span>`;
   return `<span class="st st--wait"><span aria-hidden="true">○</span>${esc(t("stWaiting"))}</span>`;
 }
 
-function waitingTable(){
-  const rows = [...data.students].sort(byLongestWait).map((s, i) => {
-    const copy = copyOf(s);
+function waitingTable(g){
+  const rows = [...g.students].sort(byLongestWait).map((s, i) => {
+    const copy = copyOf(g, s);
     return `<tr>
       <td class="sno">${i + 1}</td>
       <th scope="row" class="cell-title" data-label="${esc(t("student"))}">${esc(s.name)}</th>
-      <td class="n" data-label="${esc(t("daysWaiting"))}">${esc(days(s.days))}</td>
-      <td data-label="${esc(t("status"))}">${statusMark(s)}</td>
+      <td class="n" data-label="${esc(t("daysWaiting"))}">${s.govt ? "—" : esc(days(daysSince(s.since)))}</td>
+      <td data-label="${esc(t("status"))}">${statusMark(g, s)}</td>
       <td data-label="${esc(t("tempCopy"))}">${copy ? `<span class="code">${esc(copy.code)}</span>` : `<span class="muted">${esc(t("none"))}</span>`}</td>
     </tr>`;
   }).join("");
@@ -1018,11 +1171,11 @@ function waitingTable(){
     <tbody>${rows}</tbody></table>`;
 }
 
-function shelfTable(){
-  const rows = [...data.copies].sort((a, b) => a.code.localeCompare(b.code)).map(c => {
+function shelfTable(g){
+  const rows = [...g.copies].sort((a, b) => a.code.localeCompare(b.code)).map(c => {
     let where = `<span class="st st--temp"><span aria-hidden="true">▣</span>${esc(t("onShelf"))}</span>`;
     if (c.holder) {
-      const s = studentById(c.holder);
+      const s = studentById(g, c.holder);
       where = s.govt
         ? `<span class="st st--due"><span aria-hidden="true">↩</span>${esc(t("returnDue", { name:s.name }))}</span>`
         : `<span class="st st--govt"><span aria-hidden="true">→</span>${esc(t("withChild", { name:s.name }))}</span>`;
@@ -1033,20 +1186,29 @@ function shelfTable(){
     <thead><tr><th scope="col">${esc(t("shCopy"))}</th><th scope="col">${esc(t("whereCol"))}</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-const LOG_KEYS = { added:"logAdded", rejected:"logRejected", issued:"logIssued", returned:"logReturned", govt:"logGovt" };
-function logTable(){
-  if (!data.log.length) return `<p class="muted">${esc(t("logEmpty"))}</p>`;
-  const rows = data.log.slice(0, 8).map(e =>
+const LOG_KEYS = { added:"logAdded", rejected:"logRejected", issued:"logIssued", returned:"logReturned", govt:"logGovt", listed:"logListed" };
+function logTable(g){
+  if (!g.log.length) return `<p class="muted">${esc(t("logEmpty"))}</p>`;
+  const rows = g.log.slice(0, 8).map(e =>
     `<tr><td data-label="${esc(t("whenCol"))}"><time datetime="${esc(e.at)}">${esc(timeLabel(e.at))}</time></td><td data-label="${esc(t("entryCol"))}">${esc(t(LOG_KEYS[e.k] || e.k, e.p))}</td></tr>`).join("");
   return `<table class="reg stacked compact log" aria-label="${esc(t("logHeading"))}">
     <thead><tr><th scope="col">${esc(t("whenCol"))}</th><th scope="col">${esc(t("entryCol"))}</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-/* CRC / Block view — built exclusively from officialRows(). */
+function demandLines(){
+  return ownRows().map(r => {
+    const label = `${t("classN", { n:r.cls })} · ${subject(r.subjectKey)}`;
+    const text = r.lastYearOrder != null && r.lastYearOrder !== r.entitled
+      ? t("demandText", { n:r.entitled, old:r.lastYearOrder })
+      : t("demandTextNoOld", { n:r.entitled });
+    return { label, text };
+  });
+}
+
+/* CRC / Block view — built exclusively from officialRows() and demandLines(). */
 function crcView(){
   const rows = officialRows();
   const sum = k => rows.reduce((a, r) => a + r[k], 0);
-  const own = rows[0];
   const body = rows.map((r, i) => `<tr>
       <td class="sno">${i + 1}</td>
       <th scope="row" class="cell-title" data-label="${esc(t("schoolCol"))}">${esc(r.school)}</th>
@@ -1059,6 +1221,7 @@ function crcView(){
           : `<span class="flag c-green">0 · ${esc(t("complete"))}</span>`}</td>
       <td class="n" data-label="${esc(t("longestCol"))}">${esc(days(r.longest))}</td>
     </tr>`).join("");
+  const longestAll = Math.max(0, ...rows.map(r => r.longest || 0));
   return `
   <div class="sheet">
     <section class="title" aria-labelledby="crc-h">
@@ -1085,20 +1248,17 @@ function crcView(){
             <td class="n" data-label="${esc(t("entitledCol"))}">${sum("entitled")}</td>
             <td class="n" data-label="${esc(t("receivedCol"))}">${sum("received")}</td>
             <td class="n" data-label="${esc(t("pendingCol"))}">${sum("pending")}</td>
-            <td class="n" data-label="${esc(t("longestCol"))}">${esc(days(Math.max(...rows.map(r => r.longest))))}</td>
+            <td class="n" data-label="${esc(t("longestCol"))}">${esc(days(longestAll))}</td>
           </tr></tfoot>
         </table>
       </div>
     </section>
     <section class="sec" aria-labelledby="demand-h">
-      ${sectionHead("demand-h", t("demandHeading"))}
+      ${sectionHead("demand-h", t("demandHeading"), SCHOOL.name)}
       <div class="demand">
-        <span class="demand__num">${own.entitled}</span>
-        <div>
-          <p class="demand__text">${esc(t("demandText", { n:own.entitled, old:data.lastYearOrder }))}</p>
-          <p class="muted">${esc(t("demandWhere", { school:own.school, cls:own.cls, subject:subject(own.subjectKey) }))}</p>
-        </div>
+        <ul class="demand-list">${demandLines().map(d => `<li><b>${esc(d.label)}:</b> ${esc(d.text)}</li>`).join("")}</ul>
       </div>
+      <p class="foot-note">${esc(t("demandNote"))}</p>
     </section>
     <div class="sec btnrow"><button type="button" class="btn btn--primary" data-action="print-statement">${esc(t("printStatement"))}</button></div>
   </div>`;
@@ -1114,7 +1274,7 @@ function openModal(modal, trigger){
   if (trigger) ui.returnFocus = trigger.dataset.action;
   renderModal();
   if (!dlg.open) dlg.showModal();
-  (dlg.querySelector("[autofocus]") || dlg.querySelector("button, input"))?.focus();
+  (dlg.querySelector("[autofocus]") || dlg.querySelector("button, input, select, textarea"))?.focus();
 }
 function closeModal(){ if (dlg.open) dlg.close(); afterClose(); }
 // The native "close" event arrives asynchronously (and also covers Esc), so it must not
@@ -1154,18 +1314,19 @@ function changesTable(before, after, keys){
 
 function renderModal(){
   const m = ui.modal;
-  const R = { add:modalAdd, give:modalGive, ret:modalReturn, govt:modalGovt, reset:modalReset }[m.type];
+  const R = { add:modalAdd, give:modalGive, ret:modalReturn, govt:modalGovt, reset:modalReset, group:modalGroup, list:modalList }[m.type];
   dlg.innerHTML = R(m);
 }
 
 function modalAdd(m){
+  const g = currentGroup();
   if (m.step === "added") return frame(done(t("addedTitle")),
     note("good", th("addedMsg", { code:m.code })) + changesTable(m.before, m.after, ["available", "pending"]),
     btnClose("done", true));
   if (m.step === "rejected") return frame(t("rejectedTitle"),
     note("rule", esc(t("rejectedMsg"))) + changesTable(m.before, m.after, ["available"]),
     btnClose("done", true));
-  return frame(t("addBook"),
+  return frame(`${t("addBook")} · ${groupLabel(g)}`,
     `<p class="q" id="add-q">${esc(t("addQ"))}</p>
      <p class="hint">${esc(t("addHint"))}</p>
      <div class="choices" role="group" aria-labelledby="add-q">
@@ -1177,32 +1338,35 @@ function modalAdd(m){
 }
 
 function modalGive(m){
+  const g = currentGroup();
   if (m.step === "done") return frame(done(t("givenTitle")),
     note("good", th("givenMsg", { code:m.code, name:m.name })) +
     note("rule", `<strong>${esc(t("shortageUnchanged", { n:m.after.pending }))}</strong>`) +
     changesTable(m.before, m.after, ["pending", "available", "noPhysical"]),
     btnClose("done", true));
-  const shelf = data.copies.filter(c => !c.holder).sort((a, b) => a.code.localeCompare(b.code));
-  const waiting = data.students.filter(s => !s.govt && !copyOf(s)).sort(byLongestWait);
-  if (!shelf.length) return frame(t("giveBook"), note("wait", esc(t("noCopies"))), btnClose("close", true));
-  if (!waiting.length) return frame(t("giveBook"), note("good", esc(t("noWaiting"))), btnClose("close", true));
+  const shelf = g.copies.filter(c => !c.holder).sort((a, b) => a.code.localeCompare(b.code));
+  const waiting = g.students.filter(s => !s.govt && !copyOf(g, s)).sort(byLongestWait);
+  const title = `${t("giveBook")} · ${groupLabel(g)}`;
+  if (!shelf.length) return frame(title, note("wait", esc(t("noCopies"))), btnClose("close", true));
+  if (!waiting.length) return frame(title, note("good", esc(t("noWaiting"))), btnClose("close", true));
   const options = waiting.map((s, i) => `<li><label>
       <input type="radio" name="child" value="${esc(s.id)}" ${i === 0 ? "checked autofocus" : ""}>
-      <span class="who">${esc(s.name)}</span><span class="when">${esc(days(s.days))}</span></label></li>`).join("");
-  return frame(t("giveBook"),
+      <span class="who">${esc(s.name)}</span><span class="when">${esc(days(daysSince(s.since)))}</span></label></li>`).join("");
+  return frame(title,
     `<fieldset><legend class="q">${esc(t("giveQ"))}</legend><p class="hint">${esc(t("giveHint"))}</p><ul class="pick">${options}</ul></fieldset>
      <div class="copyline"><span>${esc(t("copyToGive"))}</span><span class="code">${esc(shelf[0].code)}</span></div>
-     ${note("rule", esc(t("willStay", { n:officialSchoolRow().pending })))}`,
+     ${note("rule", esc(t("willStay", { n:officialRowFor(g).pending })))}`,
     `${btnClose("cancel")}<button type="button" class="btn btn--primary" data-action="give-confirm">${esc(t("giveBtn"))}</button>`);
 }
 
 function modalReturn(m){
+  const g = currentGroup();
   if (m.step === "done") return frame(done(t("returnedTitle")),
     note("good", th("returnedMsg", { code:m.code, name:m.name })) +
     (m.stillWaiting ? note("wait", esc(t("stillWaitingNote", { name:m.name }))) : "") +
     changesTable(m.before, m.after, ["pending", "available", "noPhysical"]),
     btnClose("done", true));
-  const lent = data.copies.filter(c => c.holder).map(c => ({ c, s:studentById(c.holder) }))
+  const lent = g.copies.filter(c => c.holder).map(c => ({ c, s:studentById(g, c.holder) }))
     .sort((a, b) => (b.s.govt - a.s.govt) || a.c.code.localeCompare(b.c.code));
   if (!lent.length) return frame(t("returnBook"), note("plain", esc(t("noneIssued"))), btnClose("close", true));
   const rows = lent.map(({ c, s }, i) => `<li class="${s.govt ? "due" : ""}">
@@ -1212,28 +1376,40 @@ function modalReturn(m){
 }
 
 function modalGovt(m){
+  const g = currentGroup();
   if (m.step === "done") {
     const recall = m.recall.length
       ? note("wait", `<strong>${esc(t("recallTitle"))}</strong><ul class="namelist">${m.recall.map(r => `<li>${esc(r.name)} — <span class="code">${esc(r.code)}</span></li>`).join("")}</ul>`)
       : "";
     return frame(done(t("govDoneTitle")),
       changesTable(m.before, m.after, ["pending", "received", "noPhysical", "available"]) +
-      note("plain", `${esc(t("handOut"))} <strong>${m.handed.map(esc).join(", ")}</strong>`) +
+      (m.handed.length ? note("plain", `${esc(t("handedTo"))} <strong>${m.handed.map(esc).join(", ")}</strong>`) : "") +
       recall + note("lock", esc(t("bankSeparate"))),
       (m.recall.length ? `<button type="button" class="btn" data-action="goto-return">${esc(t("openReturn"))}</button>` : "") + btnClose("done", true));
   }
-  const pending = officialSchoolRow().pending;
-  if (pending === 0) return frame(t("govArrived"), note("good", esc(t("nonePending"))), btnClose("close", true));
-  return frame(t("govArrived"),
+  const pending = officialRowFor(g).pending;
+  const title = `${t("govArrived")} · ${groupLabel(g)}`;
+  if (pending === 0) return frame(title, note("good", esc(t("nonePending"))), btnClose("close", true));
+  const waiting = g.students.filter(s => !s.govt).sort(byLongestWait);
+  const ticks = m.ticked || waiting.slice(0, Number(m.qty) || 0).map(s => s.id);
+  const checklist = waiting.length ? `
+     <fieldset><legend class="q">${esc(t("whoGot"))}</legend><p class="hint">${esc(t("whoGotHint"))}</p>
+       <ul class="checks">${waiting.map(s => `<li><label>
+         <input type="checkbox" name="got" value="${esc(s.id)}" ${ticks.includes(s.id) ? "checked" : ""}>
+         <span class="who">${esc(s.name)}</span>${copyOf(g, s) ? `<span class="tag">◐ ${esc(copyOf(g, s).code)}</span>` : ""}<span class="when">${esc(days(daysSince(s.since)))}</span>
+       </label></li>`).join("")}</ul>
+     </fieldset>` : "";
+  return frame(title,
     `<label class="q" for="qty">${esc(t("govQ"))}</label>
      <p class="hint" id="qty-hint">${esc(t("govHint"))}</p>
      <div class="stepper">
        <button type="button" data-action="qty-minus" aria-label="${esc(t("fewer"))}">−</button>
-       <input id="qty" type="number" inputmode="numeric" min="1" max="${pending}" step="1" value="${m.qty}" aria-describedby="qty-hint qty-err" autofocus>
+       <input id="qty" type="number" inputmode="numeric" min="1" max="${pending}" step="1" value="${esc(m.qty)}" aria-describedby="qty-hint qty-err" autofocus>
        <button type="button" data-action="qty-plus" aria-label="${esc(t("more"))}">+</button>
      </div>
      <p class="hint">${esc(t("pendingBefore", { n:pending }))}</p>
-     <p class="error" id="qty-err" role="alert">${m.error ? esc(t("qtyError", { max:pending })) : ""}</p>
+     ${checklist}
+     <p class="error" id="qty-err" role="alert">${m.error ? esc(t(m.error.key, m.error.params)) : ""}</p>
      ${note("rule", esc(t("rule")))}`,
     `${btnClose("cancel")}<button type="button" class="btn btn--primary" data-action="govt-confirm">${esc(t("govBtn"))}</button>`);
 }
@@ -1243,83 +1419,241 @@ function modalReset(){
     `${btnClose("cancel")}<button type="button" class="btn btn--danger" data-action="reset-confirm" autofocus>${esc(t("resetYes"))}</button>`);
 }
 
+/* Add a class + subject, or edit the enrolment of the current one. */
+function modalGroup(m){
+  if (m.step === "added") {
+    const g = data.groups.find(x => x.id === m.groupId);
+    return frame(done(t("groupAdded")),
+      note("good", th("groupAddedMsg", { group:groupLabel(g), n:officialRowFor(g).pending })),
+      `${btnClose("done")}<button type="button" class="btn btn--primary" data-action="open-list" autofocus>${esc(t("addChildrenNow"))}</button>`);
+  }
+  const f = m.form;
+  const err = m.error ? `<p class="error" role="alert">${esc(t(m.error.key, m.error.params))}</p>` : "";
+  if (m.mode === "edit") {
+    const g = currentGroup();
+    return frame(`${t("groupTitleEdit")} · ${groupLabel(g)}`,
+      `<div class="grid2">
+         ${numberField("f-entitled", t("fEntitled"), f.entitled, true)}
+         ${numberField("f-last", t("fLastYear"), f.lastYearOrder)}
+       </div>
+       <p class="hint"><strong>${esc(t("eqReceived"))}: ${g.govtReceived}.</strong> ${esc(t("receivedLocked"))}</p>
+       ${err}`,
+      `${btnClose("cancel")}<button type="button" class="btn btn--primary" data-action="group-save">${esc(t("save"))}</button>`);
+  }
+  return frame(t("groupTitleNew"),
+    `<div class="grid2">
+       <div class="field"><label for="f-class">${esc(t("classCol"))}</label>
+         <select id="f-class" autofocus>${CLASSES.map(c => `<option value="${c}" ${c === f.cls ? "selected" : ""}>${esc(t("classN", { n:c }))}</option>`).join("")}</select></div>
+       <div class="field"><label for="f-subject">${esc(t("subjectCol"))}</label>
+         <select id="f-subject">${SUBJECTS.map(s => `<option value="${s.key}" ${s.key === f.subjectKey ? "selected" : ""}>${esc(subject(s.key))}</option>`).join("")}</select></div>
+       ${numberField("f-entitled", t("fEntitled"), f.entitled)}
+       ${numberField("f-received", t("fReceived"), f.govtReceived)}
+       ${numberField("f-last", t("fLastYear"), f.lastYearOrder)}
+     </div>
+     ${err}`,
+    `${btnClose("cancel")}<button type="button" class="btn btn--primary" data-action="group-save">${esc(t("save"))}</button>`);
+}
+function numberField(id, label, value, autofocus = false){
+  return `<div class="field"><label for="${id}">${esc(label)}</label>
+    <input id="${id}" type="number" inputmode="numeric" min="0" max="2000" step="1" value="${esc(value ?? "")}" ${autofocus ? "autofocus" : ""}></div>`;
+}
+
+/* The waiting list: children of this class who have not received the government book. */
+function modalList(m){
+  const g = currentGroup();
+  const o = officialRowFor(g);
+  const named = namedWaiting(g);
+  const listed = [...g.students].sort(byLongestWait).map(s => {
+    const copy = copyOf(g, s);
+    const action = copy
+      ? `<span class="meta">${esc(t("removeBlocked", { code:copy.code }))}</span>`
+      : `<button type="button" class="btn btn--small" data-action="list-remove" data-id="${esc(s.id)}">${esc(t("removeBtn"))}</button>`;
+    return `<li><span><span class="who">${esc(s.name)}</span><span class="meta">${statusMark(g, s)}${s.govt ? "" : " · " + esc(days(daysSince(s.since)))}</span></span>${action}</li>`;
+  }).join("");
+  return frame(`${t("listTitle")} · ${groupLabel(g)}`,
+    `<p class="namecount">${esc(t("namesCount", { named, pending:o.pending }))}</p>
+     ${m.flash ? note("good", esc(m.flash)) : ""}
+     <div class="field"><label for="names">${esc(t("namesLabel"))}</label>
+       <textarea id="names" rows="4" autofocus placeholder="Asha&#10;Ravi&#10;…">${esc(m.names || "")}</textarea></div>
+     <div class="field"><label for="since">${esc(t("sinceLabel"))}</label>
+       <input id="since" type="date" max="${toISODate(today())}" value="${esc(m.since)}">
+       <span class="hint">${esc(t("sinceHint"))}</span></div>
+     ${m.error ? `<p class="error" role="alert">${esc(t(m.error.key, m.error.params))}</p>` : ""}
+     <div><button type="button" class="btn btn--primary" data-action="list-add">+ ${esc(t("addToList"))}</button></div>
+     <h3 class="q" style="margin-top:6px">${esc(t("onList"))}</h3>
+     ${g.students.length ? `<ul class="rows">${listed}</ul>` : `<p class="muted">${esc(t("listEmpty"))}</p>`}`,
+    btnClose("done", false));
+}
+
 /* ==========================================================================
    8. State changes
    ========================================================================== */
 function addBook(isCurrent){
-  const before = snapshot();
+  const g = currentGroup();
+  const before = snapshot(g);
   if (!isCurrent) {
-    addLog("rejected", {});
+    addLog(g, "rejected", {});
     saveData(); render();
-    openModal({ type:"add", step:"rejected", before, after:snapshot() });
+    openModal({ type:"add", step:"rejected", before, after:snapshot(g) });
     announce(t("rejectedTitle"));
     return;
   }
-  const code = copyCode(data.nextCopy++);
-  data.copies.push({ code, holder:null });
-  addLog("added", { code });
+  const code = addCopy(g);
+  addLog(g, "added", { code });
   saveData(); render();
-  openModal({ type:"add", step:"added", code, before, after:snapshot() });
+  openModal({ type:"add", step:"added", code, before, after:snapshot(g) });
   announce(t("addedTitle") + ": " + code);
 }
 
 function giveBook(){
+  const g = currentGroup();
   const picked = dlg.querySelector("input[name=child]:checked");
-  const s = picked && studentById(picked.value);
-  const copy = data.copies.filter(c => !c.holder).sort((a, b) => a.code.localeCompare(b.code))[0];
-  if (!s || s.govt || copyOf(s) || !copy) return;
-  const before = snapshot();
+  const s = picked && studentById(g, picked.value);
+  const copy = g.copies.filter(c => !c.holder).sort((a, b) => a.code.localeCompare(b.code))[0];
+  if (!s || s.govt || copyOf(g, s) || !copy) return;
+  const before = snapshot(g);
   copy.holder = s.id;                 // Book Bank changes…
-  addLog("issued", { code:copy.code, name:s.name });
+  addLog(g, "issued", { code:copy.code, name:s.name });
   saveData(); render();               // …official figures are untouched by design.
-  const after = snapshot();
+  const after = snapshot(g);
   openModal({ type:"give", step:"done", name:s.name, code:copy.code, before, after });
   announce(t("givenTitle") + ". " + t("shortageUnchanged", { n:after.pending }));
 }
 
 function returnBook(code){
-  const copy = data.copies.find(c => c.code === code);
+  const g = currentGroup();
+  const copy = g.copies.find(c => c.code === code);
   if (!copy || !copy.holder) return;
-  const s = studentById(copy.holder);
-  const before = snapshot();
+  const s = studentById(g, copy.holder);
+  const before = snapshot(g);
   copy.holder = null;
-  addLog("returned", { code, name:s.name });
+  addLog(g, "returned", { code, name:s.name });
   saveData(); render();
-  openModal({ type:"ret", step:"done", code, name:s.name, stillWaiting:!s.govt, before, after:snapshot() });
+  openModal({ type:"ret", step:"done", code, name:s.name, stillWaiting:!s.govt, before, after:snapshot(g) });
   announce(t("returnedTitle"));
 }
 
+function tickedIds(){ return [...dlg.querySelectorAll("input[name=got]:checked")].map(i => i.value); }
+// Changing the number re-ticks the longest-waiting children, so the usual case needs no extra taps.
+function retick(){
+  const g = currentGroup();
+  const n = parseInt(dlg.querySelector("#qty").value, 10) || 0;
+  const order = g.students.filter(s => !s.govt).sort(byLongestWait).map(s => s.id);
+  dlg.querySelectorAll("input[name=got]").forEach(box => { box.checked = order.indexOf(box.value) < n; });
+  ui.modal.qty = String(dlg.querySelector("#qty").value);
+  ui.modal.ticked = null;
+}
+
 function recordGovtArrival(){
-  const pending = officialSchoolRow().pending;
+  const g = currentGroup();
+  const pending = officialRowFor(g).pending;
   const input = dlg.querySelector("#qty");
   const n = Number(input.value);
-  if (!Number.isInteger(n) || n < 1 || n > pending) {
-    ui.modal.qty = input.value; ui.modal.error = true; renderModal();
+  const ticked = tickedIds();
+  let error = null;
+  if (!Number.isInteger(n) || n < 1 || n > pending) error = { key:"qtyError", params:{ max:pending } };
+  else if (ticked.length > n) error = { key:"tickError", params:{ k:ticked.length, n } };
+  if (error) {
+    Object.assign(ui.modal, { qty:input.value, ticked, error });
+    renderModal();
     dlg.querySelector("#qty").focus();
     return;
   }
-  const before = snapshot();
-  data.govtReceived += n;
-  // Official books go to the longest-waiting children first — a temporary copy never lowers a child's priority.
-  const handed = data.students.filter(s => !s.govt).sort(byLongestWait).slice(0, n);
+  const before = snapshot(g);
+  g.govtReceived += n;               // the ONLY place the official shortage goes down
+  const handed = ticked.map(id => studentById(g, id));
   handed.forEach(s => { s.govt = true; });
-  addLog("govt", { n });
+  addLog(g, "govt", { n });
   saveData(); render();
-  const recall = handed.map(s => ({ name:s.name, copy:copyOf(s) })).filter(r => r.copy).map(r => ({ name:r.name, code:r.copy.code }));
-  openModal({ type:"govt", step:"done", before, after:snapshot(), handed:handed.map(s => s.name), recall });
-  announce(t("govDoneTitle") + ". " + t("cardPending") + ": " + officialSchoolRow().pending);
+  const recall = handed.filter(s => copyOf(g, s)).map(s => ({ name:s.name, code:copyOf(g, s).code }));
+  openModal({ type:"govt", step:"done", before, after:snapshot(g), handed:handed.map(s => s.name), recall });
+  announce(t("govDoneTitle") + ". " + t("cardPending") + ": " + officialRowFor(g).pending);
 }
 
 function stepQty(delta){
-  const pending = officialSchoolRow().pending;
+  const pending = officialRowFor(currentGroup()).pending;
   const input = dlg.querySelector("#qty");
   const cur = parseInt(input.value, 10);
   input.value = String(Math.min(pending, Math.max(1, (Number.isFinite(cur) ? cur : 0) + delta)));
-  ui.modal.qty = input.value;
+  retick();
+}
+
+function readInt(id){
+  const el = dlg.querySelector("#" + id);
+  if (!el || el.value.trim() === "") return null;
+  const n = Number(el.value);
+  return Number.isInteger(n) && n >= 0 && n <= 2000 ? n : NaN;
+}
+
+function saveGroup(){
+  const m = ui.modal;
+  const entitled = readInt("f-entitled");
+  const last = readInt("f-last");
+  if (m.mode === "edit") {
+    const g = currentGroup();
+    m.form = { entitled, lastYearOrder:last };
+    if (entitled === null || Number.isNaN(entitled) || Number.isNaN(last) || entitled < g.govtReceived) {
+      m.error = { key:"numbersError", params:{} }; renderModal(); return;
+    }
+    const newPending = entitled - g.govtReceived;
+    if (namedWaiting(g) > newPending) { m.error = { key:"entitledTooLow", params:{ n:namedWaiting(g) } }; renderModal(); return; }
+    g.entitled = entitled; g.lastYearOrder = last;
+    saveData(); closeModal(); render();
+    return;
+  }
+  const cls = dlg.querySelector("#f-class").value, subjectKey = dlg.querySelector("#f-subject").value;
+  const received = readInt("f-received") ?? 0;
+  m.form = { cls, subjectKey, entitled, govtReceived:received, lastYearOrder:last };
+  if (data.groups.some(g => g.cls === cls && g.subjectKey === subjectKey)) { m.error = { key:"groupExists", params:{} }; renderModal(); return; }
+  if (entitled === null || [entitled, received, last].some(Number.isNaN) || received > entitled) {
+    m.error = { key:"numbersError", params:{} }; renderModal(); return;
+  }
+  const g = newGroup(data, { cls, subjectKey, entitled, govtReceived:received, lastYearOrder:last });
+  prefs.group = g.id; savePrefs();
+  saveData(); ui.shown = null; render();
+  openModal({ type:"group", step:"added", groupId:g.id });
+  announce(t("groupAdded"));
+}
+
+function addToList(){
+  const g = currentGroup();
+  const m = ui.modal;
+  m.names = dlg.querySelector("#names").value;
+  m.since = dlg.querySelector("#since").value || sessionStart();
+  m.flash = null; m.error = null;
+  const seen = new Set(g.students.map(s => s.name.toLocaleLowerCase()));
+  const fresh = [], dupes = [];
+  for (const raw of m.names.split(/\r?\n/)) {
+    const name = raw.trim().replace(/\s+/g, " ").slice(0, MAX_NAME);
+    if (!name) continue;
+    const key = name.toLocaleLowerCase();
+    if (seen.has(key)) dupes.push(name); else { seen.add(key); fresh.push(name); }
+  }
+  const room = Math.max(0, officialRowFor(g).pending - namedWaiting(g));
+  if (!fresh.length) m.error = dupes.length ? { key:"duplicateName", params:{ names:dupes.join(", ") } } : { key:"namesEmpty", params:{} };
+  else if (m.since > toISODate(today())) m.error = { key:"sinceFuture", params:{} };
+  else if (fresh.length > room) m.error = { key:"tooMany", params:{ n:room } };
+  if (m.error) { renderModal(); dlg.querySelector("#names").focus(); return; }
+  fresh.forEach(name => addStudent(data, g, name, m.since));
+  addLog(g, "listed", { n:fresh.length });
+  m.names = "";
+  m.flash = t("childrenAdded", { n:fresh.length }) + (dupes.length ? " " + t("duplicateName", { names:dupes.join(", ") }) : "");
+  saveData(); render();
+  dlg.querySelector("#names").focus();
+  announce(m.flash);
+}
+
+function removeFromList(id){
+  const g = currentGroup();
+  const s = studentById(g, id);
+  if (!s || copyOf(g, s)) return;
+  g.students = g.students.filter(x => x.id !== id);
+  saveData(); render();
 }
 
 function resetDemo(){
   data = freshData();
+  prefs.group = null; savePrefs();
   ui.shown = null;
   saveData(); closeModal(); render();
   announce(t("resetDone"));
@@ -1330,8 +1664,7 @@ function resetDemo(){
    ========================================================================== */
 function statementDoc(){
   // Official figures only. No Book Bank field exists in this document.
-  const rows = prefs.role === "crc" ? officialRows() : [officialSchoolRow()];
-  const own = officialSchoolRow();
+  const rows = prefs.role === "crc" ? officialRows() : ownRows();
   const body = rows.map(r => `<tr><td>${esc(r.school)}</td><td class="n">${esc(r.cls)}</td><td>${esc(subject(r.subjectKey))}</td>
       <td class="n">${r.entitled}</td><td class="n">${r.received}</td><td class="n"><strong>${r.pending}</strong></td><td class="n">${esc(days(r.longest))}</td></tr>`).join("");
   return `<article class="doc" lang="${prefs.lang}">
@@ -1348,7 +1681,8 @@ function statementDoc(){
       <tbody>${body}</tbody>
     </table>
     <p class="protect">${esc(t("rpImportant"))} ${esc(t("rpNote"))}</p>
-    <p><strong>${esc(t("demandHeading"))}:</strong> ${esc(t("demandText", { n:own.entitled, old:data.lastYearOrder }))} (${esc(own.school)}, ${esc(t("classN", { n:own.cls }))} ${esc(subject(own.subjectKey))})</p>
+    <p><strong>${esc(t("demandHeading"))} (${esc(SCHOOL.name)}):</strong></p>
+    <ul>${demandLines().map(d => `<li><strong>${esc(d.label)}:</strong> ${esc(d.text)}</li>`).join("")}</ul>
     <p>${esc(t("crcFormula"))}</p>
     <div class="signs"><div>${esc(t(prefs.role === "crc" ? "rpCrcSign" : "rpSign"))}</div><div>${esc(t("rpDate"))}</div></div>
     <p class="foot-note">${esc(t("rpSource"))} · ${esc(t("printedFrom"))}</p>
@@ -1387,13 +1721,26 @@ function setLang(code){
   if (!I18N[code]) return;
   prefs.lang = code; savePrefs(); render();
 }
+function openGroupForm(mode, el){
+  const g = currentGroup();
+  const form = mode === "edit"
+    ? { entitled:g.entitled, lastYearOrder:g.lastYearOrder }
+    : { cls:"6", subjectKey:"maths", entitled:"", govtReceived:0, lastYearOrder:"" };
+  openModal({ type:"group", mode, form, error:null }, el);
+}
 const ACTIONS = {
   "set-role":   el => { prefs.role = el.dataset.role; savePrefs(); closeModal(); ui.shown = null; render(); window.scrollTo(0, 0); $("#main").focus({ preventScroll:true }); },
   "open-add":   el => openModal({ type:"add", step:"ask" }, el),
   "open-give":  el => openModal({ type:"give", step:"choose" }, el),
   "open-return":el => openModal({ type:"ret", step:"choose" }, el),
-  "open-govt":  el => openModal({ type:"govt", step:"ask", qty:officialSchoolRow().pending, error:false }, el),
+  "open-govt":  el => openModal({ type:"govt", step:"ask", qty:String(officialRowFor(currentGroup()).pending), ticked:null, error:null }, el),
   "open-reset": el => openModal({ type:"reset" }, el),
+  "open-group-new":  el => openGroupForm("new", el),
+  "open-group-edit": el => openGroupForm("edit", el),
+  "open-list":  el => { if (!el.closest("#dlg")) ui.returnFocus = "open-list"; openModal({ type:"list", names:"", since:sessionStart(), flash:null, error:null }); },
+  "group-save": () => saveGroup(),
+  "list-add":   () => addToList(),
+  "list-remove":el => removeFromList(el.dataset.id),
   "add-yes":    () => addBook(true),
   "add-no":     () => addBook(false),
   "give-confirm": () => giveBook(),
@@ -1411,7 +1758,12 @@ document.addEventListener("click", e => {
   const el = e.target.closest("[data-action]");
   if (el && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el, e);
 });
-langSelect.addEventListener("change", () => setLang(langSelect.value));
+document.addEventListener("change", e => {
+  if (e.target === langSelect) setLang(langSelect.value);
+  if (e.target.id === "group-select") { prefs.group = e.target.value; savePrefs(); ui.shown = null; render(); $("#group-select").focus(); }
+});
+dlg.addEventListener("input", e => { if (e.target.id === "qty") retick(); });
+dlg.addEventListener("change", e => { if (e.target.name === "got" && ui.modal) ui.modal.ticked = tickedIds(); });
 dlg.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "qty") { e.preventDefault(); recordGovtArrival(); }
 });
@@ -1425,6 +1777,7 @@ window.addEventListener("storage", e => {
 });
 
 render();
+
 <\/script>
 </body>
 </html>
