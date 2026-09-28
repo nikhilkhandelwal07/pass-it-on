@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PASS IT ON: a school Book Bank prototype that supports the child without hiding the official textbook shortage.">
+<title>PASS IT ON · Prototype</title>
+<style>
+:root{--page:#ebe4d3;--sheet:#fffdf7;--ink:#1b232c;--muted:#515b65;--rule-strong:#a89c82;--blue:#1d3f6e;--red:#a3261d;--red-tint:#fcf1ef;--margin:#e3a39b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:17px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,"Noto Sans",sans-serif}
+main{max-width:760px;margin:32px auto;padding:0 12px}
+.sheet{position:relative;background:var(--sheet);border:1px solid var(--rule-strong);padding:30px 30px 34px 66px}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:36px;width:5px;border-left:1.5px solid var(--margin);border-right:1.5px solid var(--margin)}
+.kicker{margin:0;font-size:14px;font-weight:700;letter-spacing:.1em;color:var(--blue)}
+h1{margin:6px 0 10px;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--blue)}
+h1 span{display:block;color:var(--ink);font-weight:600}
+p{margin:0 0 14px}
+.stamp{display:flex;border:2px solid var(--red);background:var(--red-tint);margin:20px 0 26px}
+.stamp b{flex:none;display:flex;align-items:center;background:var(--red);color:#fff;padding:8px 14px;font-size:14px;letter-spacing:.06em}
+.stamp span{padding:10px 14px;font-weight:650}
+.links{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1.5px solid var(--ink);border-radius:4px;box-shadow:0 4px 0 var(--ink);padding:16px}
+a.card:hover{background:#e9eff7}
+a.card:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+a.card:focus-visible{outline:3px solid #f0a500;outline-offset:3px}
+a.card strong{display:block;font-size:19px;color:var(--blue)}
+a.card small{display:block;color:var(--muted);font-size:15px;margin-top:4px}
+.fine{font-size:15px;color:var(--muted);margin-top:24px}
+@media (max-width:560px){.sheet{padding:22px 16px 26px 38px}.sheet::before{left:14px;width:4px}.links{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <div class="sheet">
+    <p class="kicker">PASS IT ON</p>
+    <h1>Books move to the child.<span>The full government shortage stays visible.</span></h1>
+    <p>A school Book Bank prototype. Families pass on current-edition textbooks, and a child waiting for their government book can borrow one today. The school still reports the full official shortage to the CRC/block.</p>
+    <div class="stamp"><b>RULE</b><span>A donated or borrowed book never closes a government textbook shortage. Only the official government copy does.</span></div>
+    <div class="links">
+      <a class="card" href="pass-it-on.html"><strong>Open the prototype →</strong><small>School and CRC/Block views · English, हिंदी, ଓଡ଼ିଆ, मराठी · works on laptop and phone</small></a>
+      <a class="card" href="phone-demo.html"><strong>Phone view for projector →</strong><small>The same prototype inside a phone frame, for showing the mobile version to a room</small></a>
+    </div>
+    <p class="fine">Demo data only; the children and schools are fictional. Anything you click is saved only in your own browser, and nothing is sent anywhere. Use “Reset demo” at the bottom of the School view to start again.</p>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,1391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="PASS IT ON: an offline school Book Bank prototype that supports the child without hiding the official textbook shortage.">
+<title>PASS IT ON</title>
+<style>
+/* ==========================================================================
+   PASS IT ON — single-file offline prototype
+   Look: a school register page. Ruled lines, a red margin, ledger figures,
+   ink-coloured borders, square corners. No floating cards.
+   ========================================================================== */
+:root{
+  --page:#ebe4d3;
+  --sheet:#fffdf7;
+  --ink:#1b232c;
+  --muted:#515b65;
+  --rule:#ddd3bd;
+  --rule-strong:#a89c82;
+  --head:#f3eee1;
+  --blue:#1d3f6e;
+  --blue-tint:#e9eff7;
+  --red:#a3261d;
+  --red-tint:#fcf1ef;
+  --green:#245733;
+  --green-tint:#eef5ef;
+  --amber:#865400;
+  --amber-tint:#fdf5e2;
+  --margin:#e3a39b;
+  --focus:#f0a500;
+  --r:4px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  margin:0;background:var(--page);color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Roboto,"Noto Sans","Nirmala UI","Noto Sans Devanagari","Noto Sans Oriya","Noto Sans Odia",Mangal,Kalinga,sans-serif;
+  font-size:17px;line-height:1.5;
+}
+html:lang(hi) body,html:lang(mr) body{font-family:"Nirmala UI","Noto Sans Devanagari",Mangal,"Segoe UI",system-ui,sans-serif;line-height:1.65}
+html:lang(or) body{font-family:"Nirmala UI","Noto Sans Oriya","Noto Sans Odia",Kalinga,"Segoe UI",system-ui,sans-serif;line-height:1.7}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{line-height:1.3}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:12px;top:-60px;z-index:50;background:var(--blue);color:#fff;padding:10px 14px;text-decoration:none;font-weight:700}
+.skip:focus{top:12px}
+.code{font-family:ui-monospace,"Cascadia Mono",Consolas,"Courier New",monospace;font-size:.92em;white-space:nowrap}
+.muted{color:var(--muted)}
+.upper{letter-spacing:.06em}
+html:lang(en) .upper{text-transform:uppercase;font-size:.86em}
+
+/* ---------- Top bar ---------- */
+.topbar{background:var(--sheet);border-bottom:3px solid var(--blue);position:sticky;top:0;z-index:10}
+.topbar__inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand__mark{width:34px;height:34px;flex:none}
+.brand__name{font-weight:800;letter-spacing:.1em;color:var(--blue);font-size:19px;white-space:nowrap}
+.tabs{display:inline-flex;border:1.5px solid var(--blue);border-radius:var(--r);overflow:hidden;background:var(--sheet)}
+.tabs button{border:0;background:transparent;color:var(--blue);min-height:42px;padding:6px 18px;font-weight:700;font-size:16px;white-space:nowrap}
+.tabs button+button{border-left:1.5px solid var(--blue)}
+.tabs button:hover{background:var(--blue-tint)}
+.tabs button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.lang{display:flex;align-items:center;gap:8px;font-weight:600;font-size:16px}
+.lang select{min-height:44px;min-width:170px;border:1.5px solid var(--ink);border-radius:var(--r);background:#fff;padding:6px 10px;font-size:16px;font-weight:600;cursor:pointer}
+
+/* ---------- The register page ---------- */
+main{max-width:1100px;margin:22px auto 0;padding:0 16px;outline:none}
+.sheet{position:relative;background:var(--sheet);border:1px solid var(--rule-strong);padding:30px 34px 36px 72px}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:40px;width:5px;border-left:1.5px solid var(--margin);border-right:1.5px solid var(--margin)}
+.kicker{font-size:15px;font-weight:700;color:var(--muted)}
+.title h1{font-size:clamp(26px,3.6vw,38px);color:var(--blue);margin-top:6px;letter-spacing:-.005em}
+.title h1 span{display:block}
+.title h1 .h1b{color:var(--ink);font-weight:600}
+.title .lead{margin-top:8px;color:var(--muted)}
+.sec{margin-top:34px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:4px 16px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:14px}
+.sec-h h2{font-size:20px}
+.sec-h .aside{font-size:15px;font-weight:600}
+.aside--local{color:var(--green)}
+.aside--official{color:var(--red)}
+.aside--wait{color:var(--amber)}
+.sec-note{color:var(--muted);font-size:16px;margin:-4px 0 12px}
+
+/* Stamped notice: a printed rule with a label block, like an office stamp */
+.stamp{display:flex;align-items:stretch;border:2px solid var(--red);margin-top:18px;background:var(--red-tint)}
+.stamp__label{flex:none;display:flex;align-items:center;background:var(--red);color:#fff;font-weight:800;padding:8px 14px;letter-spacing:.06em}
+html:lang(en) .stamp__label{text-transform:uppercase;font-size:14px}
+.stamp__text{padding:10px 14px;font-weight:650}
+.stamp--blue{border-color:var(--blue);background:var(--blue-tint)}
+.stamp--blue .stamp__label{background:var(--blue)}
+
+/* ---------- Ledger of today's figures ---------- */
+.ledger{display:grid;grid-template-columns:repeat(3,1fr);border:1.5px solid var(--ink);background:#fff}
+.ledger__cell{padding:14px 18px 16px;display:flex;flex-direction:column;gap:2px}
+.ledger__cell+.ledger__cell{border-left:1px solid var(--rule-strong)}
+.ledger__cell--official{background:var(--red-tint)}
+/* The double rule between the official figure and the school-only figures is the point of the page */
+.ledger__cell--official+.ledger__cell{border-left:5px double var(--ink)}
+.ledger__who{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700}
+.mk{width:11px;height:11px;flex:none;display:inline-block}
+.ledger__label{font-size:17px;font-weight:700;margin-top:4px}
+.ledger__num{font-size:58px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums;align-self:flex-start;justify-self:end;padding:0 6px;margin-left:-6px}
+.ledger__note{font-size:15px;color:var(--muted);border-top:1px dashed var(--rule-strong);padding-top:6px;margin-top:auto}
+.c-red{color:var(--red)} .c-green{color:var(--green)} .c-amber{color:var(--amber)} .c-blue{color:var(--blue)}
+.bg-red{background:var(--red)} .bg-green{background:var(--green)} .bg-amber{background:var(--amber)}
+.ledger__cell.is-changed .ledger__num{animation:ink 1.6s ease-out}
+@keyframes ink{0%{background:#ffe7a3}100%{background:transparent}}
+
+/* ---------- Four primary actions: solid, pressable buttons ---------- */
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.action{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:14px;background:#fff;border:1.5px solid var(--ink);border-radius:var(--r);box-shadow:0 4px 0 var(--ink);min-height:100px;transition:transform .08s,box-shadow .08s}
+.action:hover{background:var(--blue-tint)}
+.action:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.action__icon{font-size:28px;line-height:1.2;flex:none}
+.action__title{display:block;font-size:19px;font-weight:800;color:var(--blue);line-height:1.3}
+.action__sub{display:block;font-size:15px;color:var(--muted);margin-top:3px}
+.action--govt{border-color:var(--red);box-shadow:0 4px 0 var(--red)}
+.action--govt:hover{background:var(--red-tint)}
+.action--govt:active{box-shadow:0 1px 0 var(--red)}
+.action--govt .action__title{color:var(--red)}
+
+/* ---------- Two accounts, kept apart ---------- */
+.accounts{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--ink);background:#fff}
+.account{padding:14px 18px 16px}
+.account+.account{border-left:5px double var(--ink)}
+.account h3{font-size:18px;display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
+.account h3 small{font-size:14px;font-weight:700}
+.leaders{list-style:none;margin:10px 0 0;padding:0}
+.leaders li{display:flex;align-items:baseline;gap:8px;padding:6px 0}
+.leaders .dots{flex:1 1 24px;min-width:24px;border-bottom:2px dotted var(--rule-strong);transform:translateY(-5px)}
+.leaders b{font-size:22px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.leaders .total{border-top:1.5px solid var(--ink);margin-top:4px;padding-top:8px;font-weight:700}
+.leaders .total b{border-bottom:4px double currentColor;line-height:1.1}
+.foot-note{font-size:15px;color:var(--muted);margin-top:10px}
+
+/* ---------- Register tables ---------- */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+.reg{border:1.5px solid var(--ink);background:#fff}
+.reg th,.reg td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:middle}
+.reg thead th{background:var(--head);border-bottom:2px solid var(--ink);font-size:15px;font-weight:700}
+html:lang(en) .reg thead th{text-transform:uppercase;letter-spacing:.05em;font-size:13px}
+.reg .sno{width:52px;color:var(--muted);border-right:1.5px solid var(--margin);text-align:center}
+.reg td.n,.reg th.n{text-align:right;font-variant-numeric:tabular-nums}
+.reg tfoot th,.reg tfoot td{border-top:2px solid var(--ink);border-bottom:0;font-weight:800;background:var(--head)}
+.reg tbody tr:last-child th,.reg tbody tr:last-child td{border-bottom:0}
+.st{font-weight:700;display:inline-flex;gap:6px;align-items:baseline}
+.st--wait{color:var(--amber)} .st--temp{color:var(--green)} .st--govt{color:var(--blue)} .st--due{color:var(--amber)}
+.flag{font-weight:800;font-variant-numeric:tabular-nums}
+
+/* ---------- School-only records ---------- */
+.records{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.records h3{font-size:17px;margin-bottom:8px}
+.log time{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:15px}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border-radius:var(--r);border:1.5px solid var(--ink);background:#fff;font-weight:700;font-size:16px;text-align:center}
+.btn:hover{background:var(--blue-tint)}
+.btn--primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn--primary:hover{background:#15315a}
+.btn--danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn--danger:hover{background:#86200f}
+.btn--link{border-color:transparent;background:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.btn--link:hover{background:transparent;color:var(--ink)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- CRC ---------- */
+.demand{display:flex;gap:18px;align-items:center;border:1.5px solid var(--blue);background:var(--blue-tint);padding:14px 18px}
+.demand__num{font-size:48px;font-weight:800;color:var(--blue);line-height:1;font-variant-numeric:tabular-nums}
+.demand__text{font-size:19px;font-weight:700}
+
+/* ---------- Footer ---------- */
+.foot{max-width:1100px;margin:0 auto;padding:12px 16px 28px;color:var(--muted);font-size:15px;display:flex;gap:4px 16px;flex-wrap:wrap;justify-content:space-between}
+.foot strong{color:var(--ink)}
+
+/* ---------- Dialog ---------- */
+dialog{border:1.5px solid var(--ink);padding:0;border-radius:6px;width:min(600px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--sheet);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(20,26,34,.6)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+.dlg__head{padding:16px 22px 10px;border-bottom:2px solid var(--ink)}
+.dlg__head h2{font-size:22px;color:var(--blue)}
+.dlg__body{padding:16px 22px;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.dlg__foot{padding:12px 22px 16px;border-top:1px solid var(--rule-strong);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.q{font-size:19px;font-weight:700}
+.hint{color:var(--muted);font-size:16px}
+.note{border-left:5px solid;padding:9px 12px;font-size:16px}
+.note strong{font-weight:750}
+.note--good{border-color:var(--green);background:var(--green-tint)}
+.note--rule{border-color:var(--red);background:var(--red-tint)}
+.note--wait{border-color:var(--amber);background:var(--amber-tint)}
+.note--lock{border-color:var(--blue);background:var(--blue-tint)}
+.note--plain{border-color:var(--rule-strong);background:#fff}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{min-height:80px;border:1.5px solid var(--ink);border-radius:var(--r);background:#fff;font-size:18px;font-weight:750;padding:12px;box-shadow:0 4px 0 var(--ink)}
+.choice:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.choice--yes{color:var(--green)}
+.choice--yes:hover{background:var(--green-tint)}
+.choice--no{color:var(--red)}
+.choice--no:hover{background:var(--red-tint)}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0;margin-bottom:4px}
+.pick{list-style:none;margin:8px 0 0;padding:0;border:1.5px solid var(--ink);background:#fff}
+.pick li+li{border-top:1px solid var(--rule)}
+.pick label{display:flex;align-items:center;gap:12px;min-height:54px;padding:8px 14px;cursor:pointer}
+.pick label:hover{background:var(--blue-tint)}
+.pick label:has(input:checked){background:var(--blue-tint);box-shadow:inset 5px 0 0 var(--blue)}
+.pick input{width:22px;height:22px;accent-color:var(--blue);flex:none;margin:0}
+.pick .who{font-weight:750;font-size:18px}
+.pick .when{margin-left:auto;color:var(--muted);white-space:nowrap}
+.rows{list-style:none;margin:0;padding:0;border:1.5px solid var(--ink);background:#fff}
+.rows li{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 14px;flex-wrap:wrap}
+.rows li+li{border-top:1px solid var(--rule)}
+.rows li.due{background:var(--amber-tint);box-shadow:inset 5px 0 0 var(--amber)}
+.rows .who{font-weight:750;font-size:18px}
+.rows .meta{display:block;font-size:15px;color:var(--muted)}
+.rows .btn{margin-left:auto}
+.copyline{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border:1.5px dashed var(--green);background:var(--green-tint);padding:10px 14px;flex-wrap:wrap}
+.copyline .code{font-size:20px;font-weight:800;color:var(--green)}
+.stepper{display:flex;align-items:stretch;gap:8px;max-width:320px}
+.stepper button{width:60px;min-height:60px;font-size:28px;font-weight:800;border-radius:var(--r);border:1.5px solid var(--ink);background:#fff}
+.stepper button:hover{background:var(--blue-tint)}
+.stepper input{flex:1;min-width:0;text-align:center;font-size:30px;font-weight:800;border:2px solid var(--blue);border-radius:var(--r);background:#fff;font-variant-numeric:tabular-nums}
+.error{color:var(--red);font-weight:700}
+.changes{width:100%;border:1.5px solid var(--ink);background:#fff}
+.changes th,.changes td{padding:9px 12px;border-bottom:1px solid var(--rule);font-size:16px}
+.changes tr:last-child th,.changes tr:last-child td{border-bottom:0}
+.changes th{font-weight:600;text-align:left}
+.changes td{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.changes td strong{font-size:20px}
+.changes .official{background:var(--red-tint)}
+.changes .official th{color:var(--red);font-weight:700}
+.changes .arrow{color:var(--muted);padding:0 4px}
+.changes .same{font-size:14px;color:var(--muted);font-style:italic;margin-left:6px}
+.namelist{margin:6px 0 0;padding-left:20px}
+
+/* ---------- Print documents (hidden on screen) ---------- */
+#print-root{display:none}
+
+/* ---------- Responsive ---------- */
+@media (max-width:980px){
+  .actions{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:820px){
+  .ledger{grid-template-columns:1fr}
+  .ledger__cell{display:grid;grid-template-columns:1fr auto;grid-template-areas:"who num" "label num" "note note";column-gap:14px;align-items:center}
+  .ledger__cell+.ledger__cell{border-left:0;border-top:1px solid var(--rule-strong)}
+  .ledger__cell--official+.ledger__cell{border-left:0;border-top:5px double var(--ink)}
+  .ledger__who{grid-area:who}
+  .ledger__label{grid-area:label}
+  .ledger__num{grid-area:num;font-size:48px}
+  .ledger__note{grid-area:note;margin-top:6px}
+  .accounts{grid-template-columns:1fr}
+  .account+.account{border-left:0;border-top:5px double var(--ink)}
+  .records{grid-template-columns:1fr}
+}
+@media (max-width:700px){
+  .topbar{position:static}
+  .topbar__inner{padding:10px 12px}
+  .tabs{width:100%}
+  .tabs button{flex:1 1 0;padding:6px 8px}
+  .lang{width:100%}
+  .lang select{flex:1}
+  main{margin-top:12px;padding:0 8px}
+  .sheet{padding:20px 14px 26px 36px}
+  .sheet::before{left:14px;width:4px}
+  .sec{margin-top:28px}
+  .foot{padding:12px 12px 24px}
+}
+@media (max-width:640px){
+  .actions{grid-template-columns:1fr}
+  .action{min-height:0;flex-direction:row;align-items:center;gap:14px}
+  /* Tables become ruled entries so nothing scrolls sideways */
+  .stacked thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .stacked,.stacked tbody,.stacked tfoot,.stacked tr,.stacked td,.stacked th{display:block;width:100%}
+  .stacked tr{padding:10px 12px;border-bottom:1px solid var(--rule)}
+  .stacked tbody tr:last-child{border-bottom:0}
+  .stacked td,.stacked th{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;border:0;text-align:right;background:none}
+  .stacked td::before,.stacked th::before{content:attr(data-label);font-weight:600;color:var(--muted);text-align:left;font-size:15px}
+  .stacked .cell-title{font-size:18px;font-weight:800;text-align:left}
+  .stacked .cell-title::before,.stacked .sno::before{content:none}
+  .stacked .cell-empty,.stacked .sno{display:none}
+  .stacked tfoot tr{background:var(--head);border-top:2px solid var(--ink)}
+  .compact tr{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .compact th,.compact td{display:block;width:auto;padding:0}
+  .compact td::before{content:none}
+  .compact .cell-title{font-size:16px}
+  .waitlist tr{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+  .waitlist th,.waitlist td{display:block;width:auto;padding:0;text-align:left}
+  .waitlist td::before{content:none}
+  .waitlist td.n{text-align:right;color:var(--muted)}
+  .waitlist td:last-child{text-align:right}
+  .choices{grid-template-columns:1fr}
+  .dlg__head,.dlg__body,.dlg__foot{padding-left:16px;padding-right:16px}
+  .dlg__foot .btn{flex:1 1 auto}
+  .demand{flex-direction:column;align-items:flex-start;gap:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+/* ---------- Print ---------- */
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff;font-size:11pt;line-height:1.45;color:#000}
+  .screen,.skip,dialog,#live,noscript{display:none!important}
+  #print-root{display:block!important}
+  .doc h1{font-size:18pt;margin:0 0 2mm}
+  .doc .sub{font-size:10.5pt;margin-bottom:5mm}
+  .doc .meta{display:flex;flex-wrap:wrap;gap:3mm 10mm;margin:0 0 5mm;font-size:11pt}
+  .doc table{width:100%;border-collapse:collapse;margin:0 0 5mm}
+  .doc tbody td:first-child{white-space:nowrap}
+  .doc th,.doc td{border:1px solid #000;padding:2.4mm 2.6mm;font-size:10.5pt;text-align:left;background:none;color:#000}
+  .doc thead th{background:#eee!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:700}
+  .doc td.n,.doc th.n{text-align:right}
+  .doc .protect{border:2.5px solid #000;padding:4mm 5mm;font-size:12pt;font-weight:700;margin:0 0 5mm}
+  .doc .rules{border:1.5px solid #000;padding:3mm 5mm;margin:0 0 5mm}
+  .doc .rules ol{margin:1mm 0 0;padding-left:6mm}
+  .doc .rules li{font-weight:600;margin:1mm 0}
+  .doc .signs{display:flex;gap:12mm;margin-top:14mm}
+  .doc .signs div{flex:1;border-top:1px solid #000;padding-top:1.5mm;font-size:10pt}
+  .doc .foot-note{font-size:9pt;color:#333;margin-top:6mm}
+  .doc .blank td{height:9mm}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="skip">Skip to main content</a>
+
+<div class="screen">
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <rect x="1" y="1" width="38" height="38" rx="5" fill="#1d3f6e"/>
+          <path d="M7.5 12.5c4.3-1.6 8.5-1.2 12.5 1.2v15.6c-4-2.3-8.2-2.7-12.5-1.2z" fill="#fffdf7"/>
+          <path d="M32.5 12.5c-4.3-1.6-8.5-1.2-12.5 1.2v15.6c4-2.3 8.2-2.7 12.5-1.2z" fill="#f3dfa8"/>
+          <path d="M20 13.7v15.6" stroke="#1d3f6e" stroke-width="1.4"/>
+          <path d="M24 20.5h5.5m-2.2-2.4 2.4 2.4-2.4 2.4" stroke="#1d3f6e" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="brand__name">PASS IT ON</span>
+      </div>
+      <div class="tabs" role="group" data-i18n-aria="viewLabel">
+        <button type="button" data-action="set-role" data-role="school" aria-pressed="true" data-i18n="school">School</button>
+        <button type="button" data-action="set-role" data-role="crc" aria-pressed="false" data-i18n="crc">CRC / Block</button>
+      </div>
+      <label class="lang"><span data-i18n="langLabel">Language</span>
+        <select id="lang-select"></select>
+      </label>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1"><div id="view"></div></main>
+
+  <footer class="foot">
+    <span><strong data-i18n="footer">Support the child without hiding the shortage.</strong></span>
+    <span data-i18n="footerDemo">Demo data · saved only on this device</span>
+  </footer>
+</div>
+
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<dialog id="dlg" aria-labelledby="dlg-title"></dialog>
+<div id="print-root"></div>
+<noscript><p style="padding:20px;font-size:18px">Please turn on JavaScript to use this prototype.</p></noscript>
+
+<script>
+"use strict";
+
+/* ==========================================================================
+   1. Languages. To add a language: add one line to LANGS and a matching
+      block to I18N (any missing text falls back to English).
+      Student names, school names and copy codes are never translated.
+   ========================================================================== */
+const LANGS = [
+  { code:"en", name:"English",          locale:"en-IN" },
+  { code:"hi", name:"हिंदी (Hindi)",     locale:"hi-IN" },
+  { code:"or", name:"ଓଡ଼ିଆ (Odia)",      locale:"or-IN" },
+  { code:"mr", name:"मराठी (Marathi)",   locale:"mr-IN" }
+];
+const I18N = {
+en: {
+  sNo:"No.", ruleStamp:"Rule", privacyStamp:"Privacy", whereCol:"Where is it", whenCol:"When", entryCol:"Entry", localRecords:"School-only records", localRecordsNote:"Kept on this device. Never sent to CRC.",
+  skip:"Skip to main content",
+  viewLabel:"View", langLabel:"Language", school:"School", crc:"CRC / Block",
+  classN:"Class {n}", science:"Science", maths:"Maths",
+  heroA:"Books move to the child.", heroB:"The full government shortage remains visible to the system.",
+  rule:"A donated or borrowed book never closes a government textbook shortage. Only the official government copy does.",
+  countsHeading:"Today’s numbers",
+  cardPendingTag:"Official · reported to CRC", cardPending:"Government books still pending", cardPendingHelp:"{e} students entitled − {r} govt books received",
+  cardBankTag:"School only · never sent to CRC", cardBank:"Pass It On copies available", cardBankHelp:"{n} temporary copies are with children now",
+  cardGapTag:"Today in class", cardGap:"Children without any physical copy", cardGapHelp:"Today’s learning gap. Not a government number.",
+  actionsHeading:"What do you want to do?",
+  addBook:"Add a Book", addBookSub:"A family gives a current-edition book",
+  giveBook:"Give a Book", giveBookSub:"Lend a temporary copy to a waiting child",
+  returnBook:"Book Returned", returnBookSub:"A temporary copy comes back to the shelf",
+  govArrived:"Govt Books Arrived", govArrivedSub:"Record the official delivery only",
+  twoHeading:"Two separate counts. Never subtract one from the other.",
+  govRecord:"Government record", govRecordTag:"Sent to CRC",
+  eqEntitled:"Students entitled", eqReceived:"Govt books received", eqPending:"Govt books pending",
+  classToday:"Classroom today", classTodayTag:"Stays in school",
+  ctWaiting:"Waiting for their govt book", ctLent:"Using a temporary copy meanwhile", ctNone:"No book at all today",
+  twoNote:"A temporary copy helps the child learn today. It does not change the government number.",
+  waitHeading:"Children waiting for a government book",
+  waitNote:"Longest wait first. Holding a temporary copy never moves a child down this list.",
+  waitCount:"{n} still waiting",
+  student:"Student", daysWaiting:"Days waiting", status:"Status", tempCopy:"Temporary copy", days:"{n} days",
+  stWaiting:"Waiting", stTemp:"Temporary copy issued", stGovt:"Govt book received", stReturn:"Govt book received · collect temporary copy",
+  none:"None",
+  shelfHeading:"Book Bank shelf", shelfNote:"Write the copy number inside the front cover.",
+  onShelf:"On shelf", withChild:"With {name}", returnDue:"Collect from {name}",
+  logHeading:"Recent entries", logEmpty:"No entries yet.",
+  logAdded:"{code} added to the Book Bank (current edition)", logRejected:"Old edition not added",
+  logIssued:"{code} lent to {name}", logReturned:"{code} returned by {name}", logGovt:"{n} official government books received",
+  papersHeading:"Paper and reports",
+  papersNote:"The paper sheet is optional. Use it only on days the device is not used — never as a second register.",
+  printStatement:"Print monthly shortage statement", printSheet:"Print paper issue/return sheet", resetDemo:"Reset demo",
+  footer:"Support the child without hiding the shortage.", footerDemo:"Demo data · saved only on this device",
+  crcEyebrow:"CRC / Block view", crcHeading:"Official Textbook Shortage",
+  crcFormula:"Govt books pending = Students entitled − Govt books received. Nothing else is added or subtracted.",
+  crcPrivacy:"This view deliberately does not contain donated stock, temporary coverage, or borrower names.",
+  schoolCol:"School", classCol:"Class", subjectCol:"Subject", entitledCol:"Students entitled", receivedCol:"Govt books received", pendingCol:"Govt books pending", longestCol:"Longest pending",
+  total:"Total", complete:"Complete",
+  demandHeading:"Next-year demand signal", demandText:"{n} students for this class — not last year’s {old}.", demandWhere:"{school} · Class {cls} {subject}: order from actual enrolment.",
+  monthLabel:"Month",
+  close:"Close", cancel:"Cancel", done:"Done", becomes:"to", unchanged:"unchanged",
+  addQ:"Is this the current edition of the textbook?", addHint:"Check the year/edition on the first pages. It must match this year’s government textbook.",
+  voluntary:"Donations are voluntary. Never pressure a family to give a book.",
+  yesCurrent:"Yes, current edition", noOld:"No, old edition",
+  addedTitle:"Book added", addedMsg:"Copy number {code}. Write it inside the front cover.",
+  rejectedTitle:"Not added", rejectedMsg:"Old editions are not lent to children. Thank the family and give the book back.",
+  giveQ:"Who should get a temporary copy?", giveHint:"The child who has waited longest is first.",
+  copyToGive:"Copy to give", giveBtn:"Give temporary copy", willStay:"Government books still pending will stay {n}.",
+  givenTitle:"Temporary book issued", givenMsg:"Copy {code} given to {name} to take home.",
+  shortageUnchanged:"Government shortage is unchanged: {n}.",
+  noCopies:"No Pass It On copy is on the shelf right now.", noWaiting:"No child is waiting for a copy right now.",
+  returnQ:"Which temporary copy came back?", returnDueNote:"Govt book received — collect this copy", returnedBtn:"Returned",
+  returnedTitle:"Book back on the shelf", returnedMsg:"{code} from {name} is back on the shelf.",
+  stillWaitingNote:"{name} is still waiting for a government book.",
+  noneIssued:"No temporary copies are with children right now.",
+  govQ:"How many official government books arrived?", govHint:"Count only books sent by the government. Do not count donated books.",
+  fewer:"One fewer", more:"One more", pendingBefore:"Pending before this delivery: {n}", qtyError:"Enter a number from 1 to {max}.",
+  govBtn:"Record delivery", govDoneTitle:"Official delivery recorded",
+  handOut:"Give the official books to (longest waiting first):",
+  recallTitle:"Temporary copies can now be recalled to the Book Bank.", openReturn:"Open Book Returned",
+  bankSeparate:"The Book Bank stays a separate school resource. Its records are not changed.",
+  nonePending:"No government books are pending for this class.",
+  resetQ:"Reset the demo to the starting numbers?", resetMsg:"All entries on this device will be cleared. The language choice is kept.",
+  resetYes:"Yes, reset", resetDone:"Demo reset.",
+  rpTitle:"Monthly Textbook Shortage Statement", rpImportant:"Important:",
+  rpNote:"Temporary donated/book-bank copies are not included in this statement and do not reduce government entitlement.",
+  rpSource:"Prepared from enrolment and official government receipts only.",
+  rpSign:"Headteacher signature", rpCrcSign:"CRC coordinator signature", rpDate:"Date", rpBlock:"Cluster / Block",
+  shTitle:"Book Bank issue / return sheet", shSub:"Optional paper backup for days without the device",
+  shRules:"Rules", shRule1:"Donations are voluntary.", shRule2:"Temporary Book Bank copies do not replace the student’s government entitlement.", shRule3:"Only current-edition textbooks may be issued.",
+  shDate:"Date", shCopy:"Copy No.", shStudent:"Student name / roll no.", shIssRet:"Issued / Returned", shInit:"Initials",
+  printedFrom:"Printed from the PASS IT ON prototype"
+},
+hi: {
+  sNo:"क्र.", ruleStamp:"नियम", privacyStamp:"गोपनीयता", whereCol:"कहाँ है", whenCol:"कब", entryCol:"प्रविष्टि", localRecords:"केवल स्कूल के रिकॉर्ड", localRecordsNote:"इसी डिवाइस पर रहते हैं। CRC को कभी नहीं भेजे जाते।",
+  skip:"मुख्य भाग पर जाएँ",
+  viewLabel:"दृश्य", langLabel:"भाषा", school:"स्कूल", crc:"CRC / ब्लॉक",
+  classN:"कक्षा {n}", science:"विज्ञान", maths:"गणित",
+  heroA:"किताब बच्चे तक पहुँचे।", heroB:"पूरी सरकारी कमी सिस्टम को दिखती रहे।",
+  rule:"दान या उधार की किताब सरकारी पाठ्यपुस्तक की कमी को कभी पूरा नहीं करती। यह कमी केवल सरकारी किताब मिलने पर ही पूरी होती है।",
+  countsHeading:"आज की संख्याएँ",
+  cardPendingTag:"सरकारी · CRC को भेजी जाती है", cardPending:"सरकारी किताबें अभी बाकी", cardPendingHelp:"{e} हकदार विद्यार्थी − {r} मिली सरकारी किताबें",
+  cardBankTag:"केवल स्कूल · CRC को कभी नहीं", cardBank:"Pass It On किताबें उपलब्ध", cardBankHelp:"{n} अस्थायी किताबें अभी बच्चों के पास हैं",
+  cardGapTag:"आज कक्षा में", cardGap:"जिन बच्चों के पास कोई किताब नहीं", cardGapHelp:"आज की पढ़ाई की कमी। यह सरकारी संख्या नहीं है।",
+  actionsHeading:"आप क्या करना चाहते हैं?",
+  addBook:"किताब जमा करें", addBookSub:"परिवार वर्तमान संस्करण की किताब देता है",
+  giveBook:"किताब दें", giveBookSub:"इंतज़ार कर रहे बच्चे को अस्थायी किताब दें",
+  returnBook:"किताब वापस आई", returnBookSub:"अस्थायी किताब अलमारी में वापस",
+  govArrived:"सरकारी किताबें आईं", govArrivedSub:"केवल सरकारी डिलीवरी दर्ज करें",
+  twoHeading:"दो अलग गिनतियाँ। एक को दूसरी से कभी न घटाएँ।",
+  govRecord:"सरकारी रिकॉर्ड", govRecordTag:"CRC को भेजा जाता है",
+  eqEntitled:"हकदार विद्यार्थी", eqReceived:"मिली सरकारी किताबें", eqPending:"बाकी सरकारी किताबें",
+  classToday:"आज की कक्षा", classTodayTag:"स्कूल में ही रहता है",
+  ctWaiting:"अपनी सरकारी किताब का इंतज़ार", ctLent:"तब तक अस्थायी किताब से पढ़ रहे", ctNone:"आज कोई किताब नहीं",
+  twoNote:"अस्थायी किताब बच्चे को आज पढ़ने में मदद करती है। इससे सरकारी संख्या नहीं बदलती।",
+  waitHeading:"सरकारी किताब का इंतज़ार कर रहे बच्चे",
+  waitNote:"सबसे लंबा इंतज़ार सबसे ऊपर। अस्थायी किताब मिलने से बच्चा इस सूची में नीचे नहीं जाता।",
+  waitCount:"{n} अभी इंतज़ार में",
+  student:"विद्यार्थी", daysWaiting:"इंतज़ार के दिन", status:"स्थिति", tempCopy:"अस्थायी किताब", days:"{n} दिन",
+  stWaiting:"इंतज़ार में", stTemp:"अस्थायी किताब दी गई", stGovt:"सरकारी किताब मिली", stReturn:"सरकारी किताब मिली · अस्थायी किताब वापस लें",
+  none:"कोई नहीं",
+  shelfHeading:"पुस्तक बैंक की अलमारी", shelfNote:"प्रति संख्या किताब के कवर के अंदर लिखें।",
+  onShelf:"अलमारी में", withChild:"{name} के पास", returnDue:"{name} से वापस लें",
+  logHeading:"हाल की प्रविष्टियाँ", logEmpty:"अभी कोई प्रविष्टि नहीं।",
+  logAdded:"{code} पुस्तक बैंक में जोड़ी गई (वर्तमान संस्करण)", logRejected:"पुराना संस्करण नहीं जोड़ा गया",
+  logIssued:"{code} {name} को दी गई", logReturned:"{code} {name} से वापस आई", logGovt:"{n} सरकारी किताबें मिलीं",
+  papersHeading:"कागज़ और रिपोर्ट",
+  papersNote:"कागज़ी शीट ज़रूरी नहीं है। इसे सिर्फ़ उन दिनों इस्तेमाल करें जब डिवाइस न हो — दूसरे रजिस्टर की तरह नहीं।",
+  printStatement:"मासिक कमी विवरण प्रिंट करें", printSheet:"कागज़ी लेन-देन शीट प्रिंट करें", resetDemo:"डेमो रीसेट करें",
+  footer:"बच्चे की मदद करें, कमी को छिपाए बिना।", footerDemo:"डेमो डेटा · केवल इसी डिवाइस पर सुरक्षित",
+  crcEyebrow:"CRC / ब्लॉक दृश्य", crcHeading:"सरकारी पाठ्यपुस्तक की कमी",
+  crcFormula:"बाकी सरकारी किताबें = हकदार विद्यार्थी − मिली सरकारी किताबें। इसमें और कुछ जोड़ा या घटाया नहीं जाता।",
+  crcPrivacy:"इस दृश्य में जानबूझकर दान की किताबें, अस्थायी मदद या उधार लेने वाले बच्चों के नाम नहीं हैं।",
+  schoolCol:"स्कूल", classCol:"कक्षा", subjectCol:"विषय", entitledCol:"हकदार विद्यार्थी", receivedCol:"मिली सरकारी किताबें", pendingCol:"बाकी सरकारी किताबें", longestCol:"सबसे लंबा इंतज़ार",
+  total:"कुल", complete:"पूरा",
+  demandHeading:"अगले साल की मांग का संकेत", demandText:"इस कक्षा के लिए {n} विद्यार्थी — पिछले साल के {old} नहीं।", demandWhere:"{school} · कक्षा {cls} {subject}: असली नामांकन के आधार पर ऑर्डर करें।",
+  monthLabel:"माह",
+  close:"बंद करें", cancel:"रद्द करें", done:"ठीक है", becomes:"से", unchanged:"कोई बदलाव नहीं",
+  addQ:"क्या यह पाठ्यपुस्तक का वर्तमान संस्करण है?", addHint:"पहले पन्नों पर वर्ष/संस्करण देखें। यह इस साल की सरकारी पाठ्यपुस्तक से मिलना चाहिए।",
+  voluntary:"दान स्वैच्छिक है। किसी परिवार पर किताब देने का दबाव न डालें।",
+  yesCurrent:"हाँ, वर्तमान संस्करण", noOld:"नहीं, पुराना संस्करण",
+  addedTitle:"किताब जोड़ी गई", addedMsg:"प्रति संख्या {code}। इसे कवर के अंदर लिखें।",
+  rejectedTitle:"नहीं जोड़ी गई", rejectedMsg:"पुराने संस्करण बच्चों को नहीं दिए जाते। परिवार को धन्यवाद दें और किताब लौटा दें।",
+  giveQ:"अस्थायी किताब किसे दें?", giveHint:"सबसे लंबे समय से इंतज़ार करने वाला बच्चा सबसे ऊपर है।",
+  copyToGive:"दी जाने वाली प्रति", giveBtn:"अस्थायी किताब दें", willStay:"बाकी सरकारी किताबें {n} ही रहेंगी।",
+  givenTitle:"अस्थायी किताब दी गई", givenMsg:"प्रति {code} {name} को घर ले जाने के लिए दी गई।",
+  shortageUnchanged:"सरकारी कमी नहीं बदली: {n}।",
+  noCopies:"अभी अलमारी में कोई Pass It On किताब नहीं है।", noWaiting:"अभी कोई बच्चा किताब का इंतज़ार नहीं कर रहा।",
+  returnQ:"कौन-सी अस्थायी किताब वापस आई?", returnDueNote:"सरकारी किताब मिल गई — यह प्रति वापस लें", returnedBtn:"वापस आई",
+  returnedTitle:"किताब अलमारी में वापस", returnedMsg:"{name} से {code} अलमारी में वापस आ गई।",
+  stillWaitingNote:"{name} को अभी भी सरकारी किताब का इंतज़ार है।",
+  noneIssued:"अभी किसी बच्चे के पास अस्थायी किताब नहीं है।",
+  govQ:"कितनी सरकारी किताबें आईं?", govHint:"केवल सरकार से आई किताबें गिनें। दान की किताबें न गिनें।",
+  fewer:"एक कम", more:"एक ज़्यादा", pendingBefore:"इस डिलीवरी से पहले बाकी: {n}", qtyError:"1 से {max} तक की संख्या लिखें।",
+  govBtn:"डिलीवरी दर्ज करें", govDoneTitle:"सरकारी डिलीवरी दर्ज हुई",
+  handOut:"सरकारी किताबें इन्हें दें (सबसे लंबा इंतज़ार पहले):",
+  recallTitle:"अब अस्थायी किताबें पुस्तक बैंक में वापस ली जा सकती हैं।", openReturn:"“किताब वापस आई” खोलें",
+  bankSeparate:"पुस्तक बैंक स्कूल का अलग संसाधन बना रहता है। उसके रिकॉर्ड नहीं बदलते।",
+  nonePending:"इस कक्षा की कोई सरकारी किताब बाकी नहीं है।",
+  resetQ:"क्या डेमो को शुरुआती संख्याओं पर वापस करें?", resetMsg:"इस डिवाइस की सभी प्रविष्टियाँ मिट जाएँगी। चुनी हुई भाषा बनी रहेगी।",
+  resetYes:"हाँ, रीसेट करें", resetDone:"डेमो रीसेट हो गया।",
+  rpTitle:"मासिक पाठ्यपुस्तक कमी विवरण", rpImportant:"महत्वपूर्ण:",
+  rpNote:"दान/पुस्तक बैंक की अस्थायी प्रतियाँ इस विवरण में शामिल नहीं हैं और सरकारी हक को कम नहीं करतीं।",
+  rpSource:"केवल नामांकन और मिली सरकारी किताबों से तैयार।",
+  rpSign:"प्रधानाध्यापक के हस्ताक्षर", rpCrcSign:"CRC समन्वयक के हस्ताक्षर", rpDate:"दिनांक", rpBlock:"संकुल / ब्लॉक",
+  shTitle:"पुस्तक बैंक: किताब देने / वापसी की शीट", shSub:"बिना डिवाइस वाले दिनों के लिए वैकल्पिक कागज़ी बैकअप",
+  shRules:"नियम", shRule1:"दान स्वैच्छिक है।", shRule2:"पुस्तक बैंक की अस्थायी प्रतियाँ विद्यार्थी के सरकारी हक की जगह नहीं लेतीं।", shRule3:"केवल वर्तमान संस्करण की पाठ्यपुस्तकें दी जा सकती हैं।",
+  shDate:"दिनांक", shCopy:"प्रति सं.", shStudent:"विद्यार्थी का नाम / रोल नं.", shIssRet:"दी / वापस", shInit:"लघु हस्ताक्षर",
+  printedFrom:"PASS IT ON प्रोटोटाइप से प्रिंट"
+},
+or: {
+  sNo:"କ୍ର.", ruleStamp:"ନିୟମ", privacyStamp:"ଗୋପନୀୟତା", whereCol:"କେଉଁଠି ଅଛି", whenCol:"କେବେ", entryCol:"ଲେଖା", localRecords:"କେବଳ ସ୍କୁଲର ରେକର୍ଡ", localRecordsNote:"ଏହି ଡିଭାଇସରେ ରହେ। CRCକୁ କେବେ ପଠାଯାଏ ନାହିଁ।",
+  skip:"ମୁଖ୍ୟ ଅଂଶକୁ ଯାଆନ୍ତୁ",
+  viewLabel:"ଦୃଶ୍ୟ", langLabel:"ଭାଷା", school:"ସ୍କୁଲ", crc:"CRC / ବ୍ଲକ",
+  classN:"ଶ୍ରେଣୀ {n}", science:"ବିଜ୍ଞାନ", maths:"ଗଣିତ",
+  heroA:"ବହି ପିଲା ପାଖରେ ପହଞ୍ଚୁ।", heroB:"ସମ୍ପୂର୍ଣ୍ଣ ସରକାରୀ ଅଭାବ ବ୍ୟବସ୍ଥାକୁ ଦେଖାଯାଉଥାଉ।",
+  rule:"ଦାନ କିମ୍ବା ଧାର ବହି ସରକାରୀ ପାଠ୍ୟପୁସ୍ତକ ଅଭାବକୁ କେବେ ପୂରଣ କରେ ନାହିଁ। କେବଳ ସରକାରୀ ବହି ମିଳିଲେ ହିଁ ତାହା ପୂରଣ ହୁଏ।",
+  countsHeading:"ଆଜିର ସଂଖ୍ୟା",
+  cardPendingTag:"ସରକାରୀ · CRCକୁ ଜଣାଯାଏ", cardPending:"ସରକାରୀ ବହି ଏବେ ବି ବାକି", cardPendingHelp:"{e} ହକଦାର ଛାତ୍ରଛାତ୍ରୀ − {r} ମିଳିଥିବା ସରକାରୀ ବହି",
+  cardBankTag:"କେବଳ ସ୍କୁଲ ପାଇଁ · CRCକୁ କେବେ ନୁହେଁ", cardBank:"Pass It On ବହି ଉପଲବ୍ଧ", cardBankHelp:"{n}ଟି ଅସ୍ଥାୟୀ ବହି ଏବେ ପିଲାଙ୍କ ପାଖରେ",
+  cardGapTag:"ଆଜି ଶ୍ରେଣୀରେ", cardGap:"ଯେଉଁ ପିଲାଙ୍କ ପାଖରେ କୌଣସି ବହି ନାହିଁ", cardGapHelp:"ଆଜିର ପଢ଼ା ଅଭାବ। ଏହା ସରକାରୀ ସଂଖ୍ୟା ନୁହେଁ।",
+  actionsHeading:"ଆପଣ କ’ଣ କରିବାକୁ ଚାହାନ୍ତି?",
+  addBook:"ବହି ଜମା କରନ୍ତୁ", addBookSub:"ପରିବାର ଚଳିତ ସଂସ୍କରଣର ବହି ଦିଅନ୍ତି",
+  giveBook:"ବହି ଦିଅନ୍ତୁ", giveBookSub:"ଅପେକ୍ଷାରେ ଥିବା ପିଲାକୁ ଅସ୍ଥାୟୀ ବହି ଦିଅନ୍ତୁ",
+  returnBook:"ବହି ଫେରିଲା", returnBookSub:"ଅସ୍ଥାୟୀ ବହି ଥାକକୁ ଫେରିଲା",
+  govArrived:"ସରକାରୀ ବହି ଆସିଲା", govArrivedSub:"କେବଳ ସରକାରୀ ଯୋଗାଣ ଲେଖନ୍ତୁ",
+  twoHeading:"ଦୁଇଟି ଅଲଗା ଗଣନା। ଗୋଟିଏରୁ ଅନ୍ୟଟି କେବେ ବିୟୋଗ କରନ୍ତୁ ନାହିଁ।",
+  govRecord:"ସରକାରୀ ରେକର୍ଡ", govRecordTag:"CRCକୁ ପଠାଯାଏ",
+  eqEntitled:"ହକଦାର ଛାତ୍ରଛାତ୍ରୀ", eqReceived:"ମିଳିଥିବା ସରକାରୀ ବହି", eqPending:"ବାକି ସରକାରୀ ବହି",
+  classToday:"ଆଜିର ଶ୍ରେଣୀ", classTodayTag:"ସ୍କୁଲରେ ହିଁ ରହେ",
+  ctWaiting:"ନିଜ ସରକାରୀ ବହି ପାଇଁ ଅପେକ୍ଷାରେ", ctLent:"ସେପର୍ଯ୍ୟନ୍ତ ଅସ୍ଥାୟୀ ବହିରେ ପଢ଼ୁଛନ୍ତି", ctNone:"ଆଜି କୌଣସି ବହି ନାହିଁ",
+  twoNote:"ଅସ୍ଥାୟୀ ବହି ପିଲାକୁ ଆଜି ପଢ଼ିବାରେ ସାହାଯ୍ୟ କରେ। ଏହା ସରକାରୀ ସଂଖ୍ୟାକୁ ବଦଳାଏ ନାହିଁ।",
+  waitHeading:"ସରକାରୀ ବହି ପାଇଁ ଅପେକ୍ଷାରେ ଥିବା ପିଲା",
+  waitNote:"ସବୁଠାରୁ ଅଧିକ ଅପେକ୍ଷା ସବୁଠାରୁ ଉପରେ। ଅସ୍ଥାୟୀ ବହି ପାଇଲେ ବି ପିଲା ଏହି ତାଲିକାରେ ତଳକୁ ଯାଏ ନାହିଁ।",
+  waitCount:"{n} ଜଣ ଏବେ ବି ଅପେକ୍ଷାରେ",
+  student:"ଛାତ୍ରଛାତ୍ରୀ", daysWaiting:"ଅପେକ୍ଷାର ଦିନ", status:"ସ୍ଥିତି", tempCopy:"ଅସ୍ଥାୟୀ ବହି", days:"{n} ଦିନ",
+  stWaiting:"ଅପେକ୍ଷାରେ", stTemp:"ଅସ୍ଥାୟୀ ବହି ଦିଆଗଲା", stGovt:"ସରକାରୀ ବହି ମିଳିଲା", stReturn:"ସରକାରୀ ବହି ମିଳିଲା · ଅସ୍ଥାୟୀ ବହି ଫେରାଇ ନିଅନ୍ତୁ",
+  none:"ନାହିଁ",
+  shelfHeading:"ବହି ବ୍ୟାଙ୍କ ଥାକ", shelfNote:"ପ୍ରତି ନମ୍ବରକୁ ବହିର ମଲାଟ ଭିତରେ ଲେଖନ୍ତୁ।",
+  onShelf:"ଥାକରେ", withChild:"{name} ପାଖରେ", returnDue:"ଫେରାଇ ନିଅନ୍ତୁ · {name}",
+  logHeading:"ସାମ୍ପ୍ରତିକ ଲେଖା", logEmpty:"ଏପର୍ଯ୍ୟନ୍ତ କିଛି ଲେଖା ନାହିଁ।",
+  logAdded:"{code} ବହି ବ୍ୟାଙ୍କରେ ଯୋଡ଼ାଗଲା (ଚଳିତ ସଂସ୍କରଣ)", logRejected:"ପୁରୁଣା ସଂସ୍କରଣ ଯୋଡ଼ାଗଲା ନାହିଁ",
+  logIssued:"{code} ଦିଆଗଲା · {name}", logReturned:"{code} ଫେରିଲା · {name}", logGovt:"{n}ଟି ସରକାରୀ ବହି ମିଳିଲା",
+  papersHeading:"କାଗଜ ଓ ରିପୋର୍ଟ",
+  papersNote:"କାଗଜ ସିଟ ବାଧ୍ୟତାମୂଳକ ନୁହେଁ। ଯେଉଁ ଦିନ ଡିଭାଇସ ବ୍ୟବହାର ହେଉନାହିଁ କେବଳ ସେହି ଦିନ ଏହାକୁ ବ୍ୟବହାର କରନ୍ତୁ — ଦ୍ୱିତୀୟ ରେଜିଷ୍ଟର ଭାବେ ନୁହେଁ।",
+  printStatement:"ମାସିକ ଅଭାବ ବିବରଣୀ ପ୍ରିଣ୍ଟ କରନ୍ତୁ", printSheet:"କାଗଜ ଦେବା/ଫେରସ୍ତ ସିଟ ପ୍ରିଣ୍ଟ କରନ୍ତୁ", resetDemo:"ଡେମୋ ରିସେଟ କରନ୍ତୁ",
+  footer:"ଅଭାବକୁ ନ ଲୁଚାଇ ପିଲାକୁ ସାହାଯ୍ୟ କରନ୍ତୁ।", footerDemo:"ଡେମୋ ତଥ୍ୟ · କେବଳ ଏହି ଡିଭାଇସରେ ସଞ୍ଚିତ",
+  crcEyebrow:"CRC / ବ୍ଲକ ଦୃଶ୍ୟ", crcHeading:"ସରକାରୀ ପାଠ୍ୟପୁସ୍ତକ ଅଭାବ",
+  crcFormula:"ବାକି ସରକାରୀ ବହି = ହକଦାର ଛାତ୍ରଛାତ୍ରୀ − ମିଳିଥିବା ସରକାରୀ ବହି। ଏଥିରେ ଆଉ କିଛି ଯୋଗ କିମ୍ବା ବିୟୋଗ କରାଯାଏ ନାହିଁ।",
+  crcPrivacy:"ଏହି ଦୃଶ୍ୟରେ ଜାଣିଶୁଣି ଦାନ ବହି, ଅସ୍ଥାୟୀ ସହାୟତା କିମ୍ବା ଧାର ନେଇଥିବା ପିଲାଙ୍କ ନାମ ରଖାଯାଇନାହିଁ।",
+  schoolCol:"ସ୍କୁଲ", classCol:"ଶ୍ରେଣୀ", subjectCol:"ବିଷୟ", entitledCol:"ହକଦାର ଛାତ୍ରଛାତ୍ରୀ", receivedCol:"ମିଳିଥିବା ସରକାରୀ ବହି", pendingCol:"ବାକି ସରକାରୀ ବହି", longestCol:"ସବୁଠାରୁ ଲମ୍ବା ଅପେକ୍ଷା",
+  total:"ମୋଟ", complete:"ସମ୍ପୂର୍ଣ୍ଣ",
+  demandHeading:"ଆସନ୍ତା ବର୍ଷର ଚାହିଦା ସଙ୍କେତ", demandText:"ଏହି ଶ୍ରେଣୀ ପାଇଁ {n} ଜଣ ଛାତ୍ରଛାତ୍ରୀ — ଗତ ବର୍ଷର {old} ନୁହେଁ।", demandWhere:"{school} · ଶ୍ରେଣୀ {cls} {subject}: ପ୍ରକୃତ ନାମଲେଖା ଅନୁସାରେ ଅର୍ଡର କରନ୍ତୁ।",
+  monthLabel:"ମାସ",
+  close:"ବନ୍ଦ କରନ୍ତୁ", cancel:"ବାତିଲ କରନ୍ତୁ", done:"ଠିକ ଅଛି", becomes:"ରୁ", unchanged:"କୌଣସି ପରିବର୍ତ୍ତନ ନାହିଁ",
+  addQ:"ଏହା କ’ଣ ପାଠ୍ୟପୁସ୍ତକର ଚଳିତ ସଂସ୍କରଣ?", addHint:"ପ୍ରଥମ ପୃଷ୍ଠାରେ ବର୍ଷ/ସଂସ୍କରଣ ଦେଖନ୍ତୁ। ଏହା ଚଳିତ ବର୍ଷର ସରକାରୀ ପାଠ୍ୟପୁସ୍ତକ ସହ ମେଳ ଖାଇବା ଦରକାର।",
+  voluntary:"ଦାନ ସ୍ୱେଚ୍ଛାକୃତ। କୌଣସି ପରିବାରକୁ ବହି ଦେବା ପାଇଁ ଚାପ ଦିଅନ୍ତୁ ନାହିଁ।",
+  yesCurrent:"ହଁ, ଚଳିତ ସଂସ୍କରଣ", noOld:"ନା, ପୁରୁଣା ସଂସ୍କରଣ",
+  addedTitle:"ବହି ଯୋଡ଼ାଗଲା", addedMsg:"ପ୍ରତି ନମ୍ବର {code}। ଏହାକୁ ମଲାଟ ଭିତରେ ଲେଖନ୍ତୁ।",
+  rejectedTitle:"ଯୋଡ଼ାଗଲା ନାହିଁ", rejectedMsg:"ପୁରୁଣା ସଂସ୍କରଣ ପିଲାଙ୍କୁ ଦିଆଯାଏ ନାହିଁ। ପରିବାରକୁ ଧନ୍ୟବାଦ ଦେଇ ବହି ଫେରାଇ ଦିଅନ୍ତୁ।",
+  giveQ:"ଅସ୍ଥାୟୀ ବହି କାହାକୁ ଦେବେ?", giveHint:"ସବୁଠାରୁ ଅଧିକ ଦିନ ଅପେକ୍ଷା କରିଥିବା ପିଲା ସବୁଠାରୁ ଉପରେ।",
+  copyToGive:"ଦିଆଯିବା ପ୍ରତି", giveBtn:"ଅସ୍ଥାୟୀ ବହି ଦିଅନ୍ତୁ", willStay:"ବାକି ସରକାରୀ ବହି {n} ହିଁ ରହିବ।",
+  givenTitle:"ଅସ୍ଥାୟୀ ବହି ଦିଆଗଲା", givenMsg:"ପ୍ରତି {code} ଘରକୁ ନେବା ପାଇଁ ଦିଆଗଲା · {name}",
+  shortageUnchanged:"ସରକାରୀ ଅଭାବ ଅପରିବର୍ତ୍ତିତ: {n}।",
+  noCopies:"ଏବେ ଥାକରେ କୌଣସି Pass It On ବହି ନାହିଁ।", noWaiting:"ଏବେ କୌଣସି ପିଲା ବହି ପାଇଁ ଅପେକ୍ଷା କରୁନାହିଁ।",
+  returnQ:"କେଉଁ ଅସ୍ଥାୟୀ ବହି ଫେରିଲା?", returnDueNote:"ସରକାରୀ ବହି ମିଳିଗଲା — ଏହି ପ୍ରତି ଫେରାଇ ନିଅନ୍ତୁ", returnedBtn:"ଫେରିଲା",
+  returnedTitle:"ବହି ଥାକକୁ ଫେରିଲା", returnedMsg:"{code} ଥାକକୁ ଫେରିଲା · {name}",
+  stillWaitingNote:"{name} ଏବେ ବି ସରକାରୀ ବହି ପାଇଁ ଅପେକ୍ଷାରେ ଅଛନ୍ତି।",
+  noneIssued:"ଏବେ କୌଣସି ପିଲା ପାଖରେ ଅସ୍ଥାୟୀ ବହି ନାହିଁ।",
+  govQ:"କେତୋଟି ସରକାରୀ ବହି ଆସିଲା?", govHint:"କେବଳ ସରକାରଙ୍କ ପଠାଯାଇଥିବା ବହି ଗଣନ୍ତୁ। ଦାନ ବହି ଗଣନ୍ତୁ ନାହିଁ।",
+  fewer:"ଗୋଟିଏ କମ", more:"ଗୋଟିଏ ଅଧିକ", pendingBefore:"ଏହି ଯୋଗାଣ ପୂର୍ବରୁ ବାକି: {n}", qtyError:"1 ରୁ {max} ମଧ୍ୟରେ ଏକ ସଂଖ୍ୟା ଲେଖନ୍ତୁ।",
+  govBtn:"ଯୋଗାଣ ଲେଖନ୍ତୁ", govDoneTitle:"ସରକାରୀ ଯୋଗାଣ ଲେଖାଗଲା",
+  handOut:"ସରକାରୀ ବହି ଏମାନଙ୍କୁ ଦିଅନ୍ତୁ (ଅଧିକ ଅପେକ୍ଷା ଆଗରେ):",
+  recallTitle:"ଏବେ ଅସ୍ଥାୟୀ ବହିଗୁଡ଼ିକୁ ବହି ବ୍ୟାଙ୍କକୁ ଫେରାଇ ଆଣିପାରିବେ।", openReturn:"“ବହି ଫେରିଲା” ଖୋଲନ୍ତୁ",
+  bankSeparate:"ବହି ବ୍ୟାଙ୍କ ସ୍କୁଲର ଅଲଗା ସମ୍ବଳ ଭାବେ ରହେ। ଏହାର ରେକର୍ଡ ବଦଳେ ନାହିଁ।",
+  nonePending:"ଏହି ଶ୍ରେଣୀର କୌଣସି ସରକାରୀ ବହି ବାକି ନାହିଁ।",
+  resetQ:"ଡେମୋକୁ ଆରମ୍ଭ ସଂଖ୍ୟାକୁ ଫେରାଇବେ କି?", resetMsg:"ଏହି ଡିଭାଇସର ସବୁ ଲେଖା ଲିଭିଯିବ। ବଛାଯାଇଥିବା ଭାଷା ରହିବ।",
+  resetYes:"ହଁ, ରିସେଟ କରନ୍ତୁ", resetDone:"ଡେମୋ ରିସେଟ ହେଲା।",
+  rpTitle:"ମାସିକ ପାଠ୍ୟପୁସ୍ତକ ଅଭାବ ବିବରଣୀ", rpImportant:"ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ:",
+  rpNote:"ଅସ୍ଥାୟୀ ଦାନ/ବହି ବ୍ୟାଙ୍କ ପ୍ରତି ଏହି ବିବରଣୀରେ ସାମିଲ ନୁହେଁ ଏବଂ ସରକାରୀ ଅଧିକାରକୁ କମାଏ ନାହିଁ।",
+  rpSource:"କେବଳ ନାମଲେଖା ଓ ମିଳିଥିବା ସରକାରୀ ବହିରୁ ପ୍ରସ୍ତୁତ।",
+  rpSign:"ପ୍ରଧାନ ଶିକ୍ଷକଙ୍କ ଦସ୍ତଖତ", rpCrcSign:"CRC ସଂଯୋଜକଙ୍କ ଦସ୍ତଖତ", rpDate:"ତାରିଖ", rpBlock:"କ୍ଲଷ୍ଟର / ବ୍ଲକ",
+  shTitle:"ବହି ବ୍ୟାଙ୍କ: ଦେବା / ଫେରସ୍ତ ସିଟ", shSub:"ଡିଭାଇସ ନଥିବା ଦିନ ପାଇଁ ବିକଳ୍ପ କାଗଜ ବ୍ୟାକଅପ",
+  shRules:"ନିୟମ", shRule1:"ଦାନ ସ୍ୱେଚ୍ଛାକୃତ।", shRule2:"ବହି ବ୍ୟାଙ୍କର ଅସ୍ଥାୟୀ ପ୍ରତି ଛାତ୍ରଛାତ୍ରୀଙ୍କ ସରକାରୀ ଅଧିକାରର ବିକଳ୍ପ ନୁହେଁ।", shRule3:"କେବଳ ଚଳିତ ସଂସ୍କରଣର ପାଠ୍ୟପୁସ୍ତକ ଦିଆଯାଇପାରିବ।",
+  shDate:"ତାରିଖ", shCopy:"ପ୍ରତି ନଂ", shStudent:"ଛାତ୍ରଛାତ୍ରୀଙ୍କ ନାମ / ରୋଲ ନଂ", shIssRet:"ଦିଆଗଲା / ଫେରିଲା", shInit:"ସଂକ୍ଷିପ୍ତ ଦସ୍ତଖତ",
+  printedFrom:"PASS IT ON ପ୍ରୋଟୋଟାଇପରୁ ପ୍ରିଣ୍ଟ"
+},
+mr: {
+  sNo:"क्र.", ruleStamp:"नियम", privacyStamp:"गोपनीयता", whereCol:"कुठे आहे", whenCol:"केव्हा", entryCol:"नोंद", localRecords:"फक्त शाळेच्या नोंदी", localRecordsNote:"याच डिव्हाइसवर राहतात. CRC ला कधीच पाठवल्या जात नाहीत.",
+  skip:"मुख्य भागाकडे जा",
+  viewLabel:"दृश्य", langLabel:"भाषा", school:"शाळा", crc:"CRC / ब्लॉक",
+  classN:"इयत्ता {n}", science:"विज्ञान", maths:"गणित",
+  heroA:"पुस्तक मुलापर्यंत पोहोचू द्या.", heroB:"पूर्ण सरकारी तूट व्यवस्थेला दिसत राहू द्या.",
+  rule:"दान केलेले किंवा उसने घेतलेले पुस्तक सरकारी पाठ्यपुस्तकांची तूट कधीही भरून काढत नाही. फक्त अधिकृत सरकारी प्रतच ती भरते.",
+  countsHeading:"आजची आकडेवारी",
+  cardPendingTag:"अधिकृत · CRC ला कळवली जाते", cardPending:"सरकारी पुस्तके अजून बाकी", cardPendingHelp:"{e} हक्कदार विद्यार्थी − {r} मिळालेली सरकारी पुस्तके",
+  cardBankTag:"फक्त शाळेसाठी · CRC ला कधीच नाही", cardBank:"Pass It On पुस्तके उपलब्ध", cardBankHelp:"{n} तात्पुरती पुस्तके सध्या मुलांकडे आहेत",
+  cardGapTag:"आज वर्गात", cardGap:"ज्या मुलांकडे एकही पुस्तक नाही", cardGapHelp:"आजची शिकण्यातील तूट. ही सरकारी संख्या नाही.",
+  actionsHeading:"तुम्हाला काय करायचे आहे?",
+  addBook:"पुस्तक जमा करा", addBookSub:"कुटुंब चालू आवृत्तीचे पुस्तक देते",
+  giveBook:"पुस्तक द्या", giveBookSub:"प्रतीक्षेतील मुलाला तात्पुरते पुस्तक द्या",
+  returnBook:"पुस्तक परत आले", returnBookSub:"तात्पुरते पुस्तक पुन्हा कपाटात",
+  govArrived:"सरकारी पुस्तके आली", govArrivedSub:"फक्त अधिकृत पुरवठा नोंदवा",
+  twoHeading:"दोन वेगळ्या मोजण्या. एकीतून दुसरी कधीही वजा करू नका.",
+  govRecord:"सरकारी नोंद", govRecordTag:"CRC ला पाठवली जाते",
+  eqEntitled:"हक्कदार विद्यार्थी", eqReceived:"मिळालेली सरकारी पुस्तके", eqPending:"बाकी सरकारी पुस्तके",
+  classToday:"आजचा वर्ग", classTodayTag:"शाळेतच राहते",
+  ctWaiting:"आपल्या सरकारी पुस्तकाच्या प्रतीक्षेत", ctLent:"तोपर्यंत तात्पुरत्या पुस्तकातून शिकत आहेत", ctNone:"आज एकही पुस्तक नाही",
+  twoNote:"तात्पुरते पुस्तक मुलाला आज शिकायला मदत करते. त्यामुळे सरकारी संख्या बदलत नाही.",
+  waitHeading:"सरकारी पुस्तकाच्या प्रतीक्षेत असलेली मुले",
+  waitNote:"सर्वात जास्त प्रतीक्षा सर्वात वर. तात्पुरते पुस्तक मिळाले तरी मूल या यादीत खाली जात नाही.",
+  waitCount:"{n} अजून प्रतीक्षेत",
+  student:"विद्यार्थी", daysWaiting:"प्रतीक्षेचे दिवस", status:"स्थिती", tempCopy:"तात्पुरते पुस्तक", days:"{n} दिवस",
+  stWaiting:"प्रतीक्षेत", stTemp:"तात्पुरते पुस्तक दिले", stGovt:"सरकारी पुस्तक मिळाले", stReturn:"सरकारी पुस्तक मिळाले · तात्पुरते पुस्तक परत घ्या",
+  none:"नाही",
+  shelfHeading:"पुस्तक बँकेचे कपाट", shelfNote:"प्रत क्रमांक पुस्तकाच्या मुखपृष्ठाच्या आत लिहा.",
+  onShelf:"कपाटात", withChild:"{name} कडे", returnDue:"{name} कडून परत घ्या",
+  logHeading:"अलीकडील नोंदी", logEmpty:"अजून कोणतीही नोंद नाही.",
+  logAdded:"{code} पुस्तक बँकेत जोडले (चालू आवृत्ती)", logRejected:"जुनी आवृत्ती जोडली नाही",
+  logIssued:"{code} {name} ला दिले", logReturned:"{code} {name} कडून परत आले", logGovt:"{n} अधिकृत सरकारी पुस्तके मिळाली",
+  papersHeading:"कागद आणि अहवाल",
+  papersNote:"कागदी पत्रक ऐच्छिक आहे. डिव्हाइस वापरले जात नाही अशाच दिवशी ते वापरा — दुसरे रजिस्टर म्हणून नाही.",
+  printStatement:"मासिक तूट विवरण प्रिंट करा", printSheet:"कागदी देणे/परत पत्रक प्रिंट करा", resetDemo:"डेमो रीसेट करा",
+  footer:"मुलाला मदत करा, तूट न लपवता.", footerDemo:"डेमो माहिती · फक्त याच डिव्हाइसवर जतन",
+  crcEyebrow:"CRC / ब्लॉक दृश्य", crcHeading:"अधिकृत पाठ्यपुस्तक तूट",
+  crcFormula:"बाकी सरकारी पुस्तके = हक्कदार विद्यार्थी − मिळालेली सरकारी पुस्तके. यात इतर काहीही मिळवले किंवा वजा केले जात नाही.",
+  crcPrivacy:"या दृश्यात जाणीवपूर्वक दान केलेली पुस्तके, तात्पुरती मदत किंवा उसने घेणाऱ्या मुलांची नावे नाहीत.",
+  schoolCol:"शाळा", classCol:"इयत्ता", subjectCol:"विषय", entitledCol:"हक्कदार विद्यार्थी", receivedCol:"मिळालेली सरकारी पुस्तके", pendingCol:"बाकी सरकारी पुस्तके", longestCol:"सर्वात जास्त प्रतीक्षा",
+  total:"एकूण", complete:"पूर्ण",
+  demandHeading:"पुढील वर्षाच्या मागणीचा संकेत", demandText:"या इयत्तेसाठी {n} विद्यार्थी — मागील वर्षाचे {old} नाहीत.", demandWhere:"{school} · इयत्ता {cls} {subject}: प्रत्यक्ष पटसंख्येनुसार मागणी करा.",
+  monthLabel:"महिना",
+  close:"बंद करा", cancel:"रद्द करा", done:"ठीक आहे", becomes:"वरून", unchanged:"बदल नाही",
+  addQ:"हे पाठ्यपुस्तक चालू आवृत्तीचे आहे का?", addHint:"पहिल्या पानांवरील वर्ष/आवृत्ती तपासा. ती या वर्षीच्या सरकारी पाठ्यपुस्तकाशी जुळली पाहिजे.",
+  voluntary:"दान ऐच्छिक आहे. कोणत्याही कुटुंबावर पुस्तक देण्यासाठी दबाव आणू नका.",
+  yesCurrent:"होय, चालू आवृत्ती", noOld:"नाही, जुनी आवृत्ती",
+  addedTitle:"पुस्तक जोडले", addedMsg:"प्रत क्रमांक {code}. तो मुखपृष्ठाच्या आत लिहा.",
+  rejectedTitle:"जोडले नाही", rejectedMsg:"जुन्या आवृत्त्या मुलांना दिल्या जात नाहीत. कुटुंबाचे आभार माना आणि पुस्तक परत द्या.",
+  giveQ:"तात्पुरते पुस्तक कोणाला द्यायचे?", giveHint:"सर्वात जास्त काळ प्रतीक्षेतील मूल सर्वात वर आहे.",
+  copyToGive:"द्यायची प्रत", giveBtn:"तात्पुरते पुस्तक द्या", willStay:"बाकी सरकारी पुस्तकांची संख्या {n} इतकीच राहील.",
+  givenTitle:"तात्पुरते पुस्तक दिले", givenMsg:"प्रत {code} {name} ला घरी नेण्यासाठी दिली.",
+  shortageUnchanged:"सरकारी तूट बदललेली नाही: {n}.",
+  noCopies:"सध्या कपाटात एकही Pass It On पुस्तक नाही.", noWaiting:"सध्या कोणतेही मूल पुस्तकाच्या प्रतीक्षेत नाही.",
+  returnQ:"कोणते तात्पुरते पुस्तक परत आले?", returnDueNote:"सरकारी पुस्तक मिळाले — ही प्रत परत घ्या", returnedBtn:"परत आले",
+  returnedTitle:"पुस्तक पुन्हा कपाटात", returnedMsg:"{name} कडून {code} कपाटात परत आले.",
+  stillWaitingNote:"{name} अजूनही सरकारी पुस्तकाच्या प्रतीक्षेत आहे.",
+  noneIssued:"सध्या कोणत्याही मुलाकडे तात्पुरते पुस्तक नाही.",
+  govQ:"किती अधिकृत सरकारी पुस्तके आली?", govHint:"फक्त सरकारकडून आलेली पुस्तके मोजा. दान केलेली पुस्तके मोजू नका.",
+  fewer:"एक कमी", more:"एक जास्त", pendingBefore:"या पुरवठ्यापूर्वी बाकी: {n}", qtyError:"1 ते {max} पर्यंतची संख्या लिहा.",
+  govBtn:"पुरवठा नोंदवा", govDoneTitle:"अधिकृत पुरवठा नोंदवला",
+  handOut:"सरकारी पुस्तके यांना द्या (सर्वात जास्त प्रतीक्षा आधी):",
+  recallTitle:"आता तात्पुरती पुस्तके पुस्तक बँकेत परत मागवता येतील.", openReturn:"“पुस्तक परत आले” उघडा",
+  bankSeparate:"पुस्तक बँक शाळेचे स्वतंत्र साधन राहते. तिच्या नोंदी बदलत नाहीत.",
+  nonePending:"या इयत्तेची कोणतीही सरकारी पुस्तके बाकी नाहीत.",
+  resetQ:"डेमो सुरुवातीच्या आकड्यांवर परत आणायचा?", resetMsg:"या डिव्हाइसवरील सर्व नोंदी पुसल्या जातील. निवडलेली भाषा तशीच राहील.",
+  resetYes:"होय, रीसेट करा", resetDone:"डेमो रीसेट झाला.",
+  rpTitle:"मासिक पाठ्यपुस्तक तूट विवरण", rpImportant:"महत्त्वाचे:",
+  rpNote:"दान/पुस्तक बँकेच्या तात्पुरत्या प्रती या विवरणात समाविष्ट नाहीत आणि त्या सरकारी हक्क कमी करत नाहीत.",
+  rpSource:"फक्त पटसंख्या आणि मिळालेल्या सरकारी पुस्तकांवरून तयार.",
+  rpSign:"मुख्याध्यापकांची स्वाक्षरी", rpCrcSign:"CRC समन्वयकांची स्वाक्षरी", rpDate:"दिनांक", rpBlock:"केंद्र / ब्लॉक",
+  shTitle:"पुस्तक बँक: देणे / परत पत्रक", shSub:"डिव्हाइस नसलेल्या दिवसांसाठी ऐच्छिक कागदी बॅकअप",
+  shRules:"नियम", shRule1:"दान ऐच्छिक आहे.", shRule2:"पुस्तक बँकेच्या तात्पुरत्या प्रती विद्यार्थ्याच्या सरकारी हक्काची जागा घेत नाहीत.", shRule3:"फक्त चालू आवृत्तीची पाठ्यपुस्तके दिली जाऊ शकतात.",
+  shDate:"दिनांक", shCopy:"प्रत क्र.", shStudent:"विद्यार्थ्याचे नाव / हजेरी क्र.", shIssRet:"दिले / परत", shInit:"आद्याक्षरे",
+  printedFrom:"PASS IT ON प्रोटोटाइपवरून प्रिंट"
+}
+};
+const localeOf = code => (LANGS.find(l => l.code === code) || LANGS[0]).locale;
+
+/* ==========================================================================
+   2. Demo data (illustrative Class 6 Science case from the spec)
+   ========================================================================== */
+const SCHOOL = Object.freeze({ name:"Govt School A", cls:"6", subjectKey:"science", cluster:"Demo Cluster, Demo Block", codePrefix:"BB-6-SCI-" });
+// Other schools' rows exist only as official figures — a CRC never receives Book Bank data from any school.
+const OTHER_SCHOOLS = Object.freeze([
+  { school:"Govt School B", cls:"6", subjectKey:"science", entitled:42, received:42, longest:0 },
+  { school:"Govt School C", cls:"9", subjectKey:"maths",   entitled:47, received:43, longest:18 }
+]);
+const DATA_KEY = "passiton.v2.data";
+const PREFS_KEY = "passiton.v2.prefs";
+
+function freshData(){
+  const names = [["Asha",31],["Ravi",26],["Meena",22],["Salim",18],["Pooja",16],["Bikash",14],["Rani",12],["Imran",9],["Sunita",7],["Gopal",5]];
+  return {
+    v: 2,
+    entitled: 60,          // students entitled to a government textbook (actual enrolment)
+    govtReceived: 50,      // official government books received — the ONLY thing that closes the shortage
+    lastYearOrder: 30,
+    students: names.map(([name, days], i) => ({ id:"s" + (i + 1), name, days, govt:false })),
+    copies: Array.from({ length:7 }, (_, i) => ({ code: copyCode(i + 1), holder:null })), // school-local Book Bank
+    nextCopy: 8,
+    log: []
+  };
+}
+function copyCode(n){ return SCHOOL.codePrefix + String(n).padStart(3, "0"); }
+
+/* ==========================================================================
+   3. Storage (localStorage, guarded — the app still runs if it is blocked)
+   ========================================================================== */
+const store = {
+  get(key){ try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } },
+  set(key, value){ try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage blocked: keep working in memory */ } }
+};
+function isValidData(d){
+  return !!d && d.v === 2 && Number.isFinite(d.entitled) && Number.isFinite(d.govtReceived) &&
+    Array.isArray(d.students) && Array.isArray(d.copies) && Array.isArray(d.log) && Number.isInteger(d.nextCopy);
+}
+function loadPrefs(){
+  const p = store.get(PREFS_KEY) || {};
+  return { lang: I18N[p.lang] ? p.lang : "en", role: p.role === "crc" ? "crc" : "school" };
+}
+let prefs = loadPrefs();
+let data = (() => { const d = store.get(DATA_KEY); return isValidData(d) ? d : freshData(); })();
+const savePrefs = () => store.set(PREFS_KEY, prefs);
+const saveData = () => store.set(DATA_KEY, data);
+
+/* ==========================================================================
+   4. Calculations
+   ========================================================================== */
+
+// OFFICIAL figures. Used by the school's official figure, the CRC view and the printed statement.
+// Deliberately reads ONLY enrolment, official receipts and waiting days — never data.copies.
+function officialSchoolRow(){
+  const pending = Math.max(0, data.entitled - data.govtReceived);
+  const waitingDays = data.students.filter(s => !s.govt).map(s => s.days);
+  return {
+    school: SCHOOL.name, cls: SCHOOL.cls, subjectKey: SCHOOL.subjectKey,
+    entitled: data.entitled, received: data.govtReceived, pending,
+    longest: pending > 0 && waitingDays.length ? Math.max(...waitingDays) : 0
+  };
+}
+function officialRows(){
+  return [officialSchoolRow(), ...OTHER_SCHOOLS.map(r => ({ ...r, pending: Math.max(0, r.entitled - r.received) }))];
+}
+
+// SCHOOL-LOCAL learning-continuity figures. Never passed to the CRC view or the printed statement.
+function studentById(id){ return data.students.find(s => s.id === id); }
+function copyOf(student){ return data.copies.find(c => c.holder === student.id) || null; }
+function localFigures(){
+  const onShelf = data.copies.filter(c => !c.holder);
+  const lent = data.copies.filter(c => c.holder);
+  // A temporary copy only fills today's gap while the child is still owed their government book.
+  const covering = lent.filter(c => !studentById(c.holder).govt).length;
+  const pending = officialSchoolRow().pending;
+  return {
+    available: onShelf.length, lent: lent.length, covering,
+    noPhysical: Math.max(0, pending - covering),
+    recallDue: lent.filter(c => studentById(c.holder).govt)
+  };
+}
+function snapshot(){
+  const o = officialSchoolRow(), l = localFigures();
+  return { pending:o.pending, received:o.received, available:l.available, noPhysical:l.noPhysical };
+}
+const byLongestWait = (a, b) => b.days - a.days || a.name.localeCompare(b.name);
+
+/* ==========================================================================
+   5. Helpers
+   ========================================================================== */
+const $ = sel => document.querySelector(sel);
+const ESC = { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" };
+const esc = v => String(v).replace(/[&<>"']/g, ch => ESC[ch]);
+function fill(str, params){ return str.replace(/\{(\w+)\}/g, (m, k) => (params && k in params) ? params[k] : m); }
+function t(key, params){ return fill((I18N[prefs.lang] && I18N[prefs.lang][key]) ?? I18N.en[key] ?? key, params); }
+/* HTML-safe translation; parameters are escaped and emphasised. */
+function th(key, params){
+  const safe = {};
+  for (const k in (params || {})) safe[k] = "\u0000" + k + "\u0001";
+  let out = esc(t(key, safe));
+  for (const k in (params || {})) out = out.split("\u0000" + k + "\u0001").join("<strong>" + esc(params[k]) + "</strong>");
+  return out;
+}
+const days = n => t("days", { n });
+const subject = key => t(key);
+function monthName(){
+  try { return new Intl.DateTimeFormat(localeOf(prefs.lang), { month:"long", year:"numeric" }).format(new Date()); }
+  catch { return new Intl.DateTimeFormat("en-IN", { month:"long", year:"numeric" }).format(new Date()); }
+}
+function timeLabel(iso){
+  try { return new Intl.DateTimeFormat(localeOf(prefs.lang), { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }).format(new Date(iso)); }
+  catch { return ""; }
+}
+function announce(msg){ const live = $("#live"); live.textContent = ""; setTimeout(() => { live.textContent = msg; }, 30); }
+function addLog(k, p){ data.log.unshift({ k, p, at:new Date().toISOString() }); data.log.length = Math.min(data.log.length, 40); }
+
+/* ==========================================================================
+   6. Rendering
+   ========================================================================== */
+const ui = { modal:null, returnFocus:null, shown:null };
+const langSelect = $("#lang-select");
+langSelect.innerHTML = LANGS.map(l => `<option value="${esc(l.code)}" lang="${esc(l.code)}">${esc(l.name)}</option>`).join("");
+
+function render(){
+  document.documentElement.lang = prefs.lang;
+  document.title = "PASS IT ON · " + (prefs.role === "crc" ? t("crcHeading") : t("school"));
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+  document.querySelectorAll("[data-action=set-role]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.role === prefs.role)));
+  langSelect.value = prefs.lang;
+  // Only the active view exists in the DOM, so the CRC page never even contains hidden Book Bank data.
+  $("#view").innerHTML = prefs.role === "crc" ? crcView() : schoolView();
+  if (prefs.role === "school") markChangedFigures();
+  if (ui.modal) renderModal();
+}
+
+function markChangedFigures(){
+  const now = snapshot();
+  if (ui.shown) {
+    ["pending", "available", "noPhysical"].forEach(key => {
+      if (ui.shown[key] !== now[key]) document.querySelector(`[data-stat="${key}"]`)?.classList.add("is-changed");
+    });
+  }
+  ui.shown = now;
+}
+
+const sectionHead = (id, title, aside = "", asideClass = "") =>
+  `<div class="sec-h"><h2 id="${id}">${esc(title)}</h2>${aside ? `<span class="aside ${asideClass}">${esc(aside)}</span>` : ""}</div>`;
+
+function schoolView(){
+  const o = officialSchoolRow(), l = localFigures();
+  return `
+  <div class="sheet">
+    <section class="title" aria-labelledby="hero-h">
+      <p class="kicker">${esc(SCHOOL.name)} · ${esc(t("classN", { n:SCHOOL.cls }))} · ${esc(subject(SCHOOL.subjectKey))}</p>
+      <h1 id="hero-h"><span>${esc(t("heroA"))}</span><span class="h1b">${esc(t("heroB"))}</span></h1>
+      <div class="stamp" role="note"><span class="stamp__label">${esc(t("ruleStamp"))}</span><p class="stamp__text">${esc(t("rule"))}</p></div>
+    </section>
+
+    <section class="sec" aria-labelledby="counts-h">
+      ${sectionHead("counts-h", t("countsHeading"))}
+      <div class="ledger">
+        <div class="ledger__cell ledger__cell--official" data-stat="pending">
+          <span class="ledger__who c-red"><span class="mk bg-red" aria-hidden="true"></span>${esc(t("cardPendingTag"))}</span>
+          <h3 class="ledger__label">${esc(t("cardPending"))}</h3>
+          <p class="ledger__num c-red" id="stat-pending">${o.pending}</p>
+          <p class="ledger__note">${esc(t("cardPendingHelp", { e:o.entitled, r:o.received }))}</p>
+        </div>
+        <div class="ledger__cell" data-stat="available">
+          <span class="ledger__who c-green"><span class="mk bg-green" aria-hidden="true"></span>${esc(t("cardBankTag"))}</span>
+          <h3 class="ledger__label">${esc(t("cardBank"))}</h3>
+          <p class="ledger__num c-green" id="stat-available">${l.available}</p>
+          <p class="ledger__note">${esc(t("cardBankHelp", { n:l.lent }))}</p>
+        </div>
+        <div class="ledger__cell" data-stat="noPhysical">
+          <span class="ledger__who c-amber"><span class="mk bg-amber" aria-hidden="true"></span>${esc(t("cardGapTag"))}</span>
+          <h3 class="ledger__label">${esc(t("cardGap"))}</h3>
+          <p class="ledger__num c-amber" id="stat-nophysical">${l.noPhysical}</p>
+          <p class="ledger__note">${esc(t("cardGapHelp"))}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="actions-h">
+      ${sectionHead("actions-h", t("actionsHeading"))}
+      <div class="actions">
+        ${actionButton("open-add", "📚➕", "addBook", "addBookSub")}
+        ${actionButton("open-give", "📖➡️", "giveBook", "giveBookSub")}
+        ${actionButton("open-return", "📖↩️", "returnBook", "returnBookSub")}
+        ${actionButton("open-govt", "📦✓", "govArrived", "govArrivedSub", "action--govt")}
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="two-h">
+      ${sectionHead("two-h", t("twoHeading"))}
+      <div class="accounts">
+        <div class="account">
+          <h3>${esc(t("govRecord"))}<small class="c-red">${esc(t("govRecordTag"))}</small></h3>
+          <ul class="leaders">
+            ${leader(t("eqEntitled"), o.entitled)}
+            ${leader(t("eqReceived"), "− " + o.received)}
+            ${leader(t("eqPending"), o.pending, "total c-red")}
+          </ul>
+        </div>
+        <div class="account">
+          <h3>${esc(t("classToday"))}<small class="c-green">${esc(t("classTodayTag"))}</small></h3>
+          <ul class="leaders">
+            ${leader(t("ctWaiting"), o.pending)}
+            ${leader(t("ctLent"), l.covering)}
+            ${leader(t("ctNone"), l.noPhysical, "total c-amber")}
+          </ul>
+        </div>
+      </div>
+      <p class="foot-note">${esc(t("twoNote"))}</p>
+    </section>
+
+    <section class="sec" aria-labelledby="wait-h">
+      ${sectionHead("wait-h", `${t("waitHeading")} · ${t("classN", { n:SCHOOL.cls })} ${subject(SCHOOL.subjectKey)}`,
+        t("waitCount", { n:data.students.filter(s => !s.govt).length }), "aside--wait")}
+      <p class="sec-note">${esc(t("waitNote"))}</p>
+      <div class="table-wrap">${waitingTable()}</div>
+    </section>
+
+    <section class="sec" aria-labelledby="records-h">
+      ${sectionHead("records-h", t("localRecords"), t("localRecordsNote"), "aside--local")}
+      <div class="records">
+        <div>
+          <h3>${esc(t("shelfHeading"))}</h3>
+          <p class="sec-note" style="margin:0 0 8px">${esc(t("shelfNote"))}</p>
+          ${shelfTable()}
+        </div>
+        <div>
+          <h3>${esc(t("logHeading"))}</h3>
+          ${logTable()}
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="papers-h">
+      ${sectionHead("papers-h", t("papersHeading"))}
+      <div class="btnrow">
+        <button type="button" class="btn btn--primary" data-action="print-statement">${esc(t("printStatement"))}</button>
+        <button type="button" class="btn" data-action="print-sheet">${esc(t("printSheet"))}</button>
+        <button type="button" class="btn btn--link" data-action="open-reset">${esc(t("resetDemo"))}</button>
+      </div>
+      <p class="foot-note">${esc(t("papersNote"))}</p>
+    </section>
+  </div>`;
+}
+
+function leader(label, value, cls = ""){
+  return `<li class="${cls}"><span>${esc(label)}</span><span class="dots" aria-hidden="true"></span><b>${esc(value)}</b></li>`;
+}
+
+function actionButton(action, icon, titleKey, subKey, extra = ""){
+  return `<button type="button" class="action ${extra}" data-action="${action}">
+    <span class="action__icon" aria-hidden="true">${icon}</span>
+    <span><span class="action__title">${esc(t(titleKey))}</span><span class="action__sub">${esc(t(subKey))}</span></span>
+  </button>`;
+}
+
+// Status is shown with a distinct symbol AND words, never colour alone.
+function statusMark(s){
+  const copy = copyOf(s);
+  if (s.govt && copy) return `<span class="st st--due"><span aria-hidden="true">↩</span>${esc(t("stReturn"))}</span>`;
+  if (s.govt)         return `<span class="st st--govt"><span aria-hidden="true">✓</span>${esc(t("stGovt"))}</span>`;
+  if (copy)           return `<span class="st st--temp"><span aria-hidden="true">◐</span>${esc(t("stTemp"))}</span>`;
+  return `<span class="st st--wait"><span aria-hidden="true">○</span>${esc(t("stWaiting"))}</span>`;
+}
+
+function waitingTable(){
+  const rows = [...data.students].sort(byLongestWait).map((s, i) => {
+    const copy = copyOf(s);
+    return `<tr>
+      <td class="sno">${i + 1}</td>
+      <th scope="row" class="cell-title" data-label="${esc(t("student"))}">${esc(s.name)}</th>
+      <td class="n" data-label="${esc(t("daysWaiting"))}">${esc(days(s.days))}</td>
+      <td data-label="${esc(t("status"))}">${statusMark(s)}</td>
+      <td data-label="${esc(t("tempCopy"))}">${copy ? `<span class="code">${esc(copy.code)}</span>` : `<span class="muted">${esc(t("none"))}</span>`}</td>
+    </tr>`;
+  }).join("");
+  return `<table class="reg stacked waitlist" aria-labelledby="wait-h">
+    <thead><tr><th scope="col" class="sno">${esc(t("sNo"))}</th><th scope="col">${esc(t("student"))}</th><th scope="col" class="n">${esc(t("daysWaiting"))}</th><th scope="col">${esc(t("status"))}</th><th scope="col">${esc(t("tempCopy"))}</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function shelfTable(){
+  const rows = [...data.copies].sort((a, b) => a.code.localeCompare(b.code)).map(c => {
+    let where = `<span class="st st--temp"><span aria-hidden="true">▣</span>${esc(t("onShelf"))}</span>`;
+    if (c.holder) {
+      const s = studentById(c.holder);
+      where = s.govt
+        ? `<span class="st st--due"><span aria-hidden="true">↩</span>${esc(t("returnDue", { name:s.name }))}</span>`
+        : `<span class="st st--govt"><span aria-hidden="true">→</span>${esc(t("withChild", { name:s.name }))}</span>`;
+    }
+    return `<tr><th scope="row" class="cell-title code" data-label="${esc(t("shCopy"))}">${esc(c.code)}</th><td data-label="${esc(t("whereCol"))}">${where}</td></tr>`;
+  }).join("");
+  return `<table class="reg stacked compact" aria-label="${esc(t("shelfHeading"))}">
+    <thead><tr><th scope="col">${esc(t("shCopy"))}</th><th scope="col">${esc(t("whereCol"))}</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+const LOG_KEYS = { added:"logAdded", rejected:"logRejected", issued:"logIssued", returned:"logReturned", govt:"logGovt" };
+function logTable(){
+  if (!data.log.length) return `<p class="muted">${esc(t("logEmpty"))}</p>`;
+  const rows = data.log.slice(0, 8).map(e =>
+    `<tr><td data-label="${esc(t("whenCol"))}"><time datetime="${esc(e.at)}">${esc(timeLabel(e.at))}</time></td><td data-label="${esc(t("entryCol"))}">${esc(t(LOG_KEYS[e.k] || e.k, e.p))}</td></tr>`).join("");
+  return `<table class="reg stacked compact log" aria-label="${esc(t("logHeading"))}">
+    <thead><tr><th scope="col">${esc(t("whenCol"))}</th><th scope="col">${esc(t("entryCol"))}</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+/* CRC / Block view — built exclusively from officialRows(). */
+function crcView(){
+  const rows = officialRows();
+  const sum = k => rows.reduce((a, r) => a + r[k], 0);
+  const own = rows[0];
+  const body = rows.map((r, i) => `<tr>
+      <td class="sno">${i + 1}</td>
+      <th scope="row" class="cell-title" data-label="${esc(t("schoolCol"))}">${esc(r.school)}</th>
+      <td class="n" data-label="${esc(t("classCol"))}">${esc(r.cls)}</td>
+      <td data-label="${esc(t("subjectCol"))}">${esc(subject(r.subjectKey))}</td>
+      <td class="n" data-label="${esc(t("entitledCol"))}">${r.entitled}</td>
+      <td class="n" data-label="${esc(t("receivedCol"))}">${r.received}</td>
+      <td class="n" data-label="${esc(t("pendingCol"))}">${r.pending > 0
+          ? `<span class="flag c-red">${r.pending}</span>`
+          : `<span class="flag c-green">0 · ${esc(t("complete"))}</span>`}</td>
+      <td class="n" data-label="${esc(t("longestCol"))}">${esc(days(r.longest))}</td>
+    </tr>`).join("");
+  return `
+  <div class="sheet">
+    <section class="title" aria-labelledby="crc-h">
+      <p class="kicker">${esc(t("crcEyebrow"))} · ${esc(SCHOOL.cluster)} · ${esc(t("monthLabel"))}: ${esc(monthName())}</p>
+      <h1 id="crc-h">${esc(t("crcHeading"))}</h1>
+      <p class="lead">${esc(t("crcFormula"))}</p>
+      <div class="stamp stamp--blue" role="note"><span class="stamp__label">${esc(t("privacyStamp"))}</span><p class="stamp__text">${esc(t("crcPrivacy"))}</p></div>
+    </section>
+    <section class="sec" aria-labelledby="crc-t">
+      ${sectionHead("crc-t", t("crcHeading"))}
+      <div class="table-wrap">
+        <table class="reg stacked" id="crc-table" aria-labelledby="crc-t">
+          <thead><tr>
+            <th scope="col" class="sno">${esc(t("sNo"))}</th>
+            <th scope="col">${esc(t("schoolCol"))}</th><th scope="col" class="n">${esc(t("classCol"))}</th><th scope="col">${esc(t("subjectCol"))}</th>
+            <th scope="col" class="n">${esc(t("entitledCol"))}</th><th scope="col" class="n">${esc(t("receivedCol"))}</th>
+            <th scope="col" class="n">${esc(t("pendingCol"))}</th><th scope="col" class="n">${esc(t("longestCol"))}</th>
+          </tr></thead>
+          <tbody>${body}</tbody>
+          <tfoot><tr>
+            <td class="sno"></td>
+            <th scope="row" class="cell-title">${esc(t("total"))}</th>
+            <td class="cell-empty"></td><td class="cell-empty"></td>
+            <td class="n" data-label="${esc(t("entitledCol"))}">${sum("entitled")}</td>
+            <td class="n" data-label="${esc(t("receivedCol"))}">${sum("received")}</td>
+            <td class="n" data-label="${esc(t("pendingCol"))}">${sum("pending")}</td>
+            <td class="n" data-label="${esc(t("longestCol"))}">${esc(days(Math.max(...rows.map(r => r.longest))))}</td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </section>
+    <section class="sec" aria-labelledby="demand-h">
+      ${sectionHead("demand-h", t("demandHeading"))}
+      <div class="demand">
+        <span class="demand__num">${own.entitled}</span>
+        <div>
+          <p class="demand__text">${esc(t("demandText", { n:own.entitled, old:data.lastYearOrder }))}</p>
+          <p class="muted">${esc(t("demandWhere", { school:own.school, cls:own.cls, subject:subject(own.subjectKey) }))}</p>
+        </div>
+      </div>
+    </section>
+    <div class="sec btnrow"><button type="button" class="btn btn--primary" data-action="print-statement">${esc(t("printStatement"))}</button></div>
+  </div>`;
+}
+
+/* ==========================================================================
+   7. Dialogs (native <dialog>: focus trap, Esc to close)
+   ========================================================================== */
+const dlg = $("#dlg");
+
+function openModal(modal, trigger){
+  ui.modal = modal;
+  if (trigger) ui.returnFocus = trigger.dataset.action;
+  renderModal();
+  if (!dlg.open) dlg.showModal();
+  (dlg.querySelector("[autofocus]") || dlg.querySelector("button, input"))?.focus();
+}
+function closeModal(){ if (dlg.open) dlg.close(); afterClose(); }
+// The native "close" event arrives asynchronously (and also covers Esc), so it must not
+// clear a dialog that was opened again in the meantime.
+function afterClose(){
+  if (dlg.open || !ui.modal) return;
+  ui.modal = null;
+  dlg.innerHTML = "";
+  const target = ui.returnFocus && document.querySelector(`#view [data-action="${ui.returnFocus}"]`);
+  (target || $("#main")).focus();
+}
+dlg.addEventListener("close", afterClose);
+dlg.addEventListener("click", e => { if (e.target === dlg) closeModal(); }); // backdrop click
+
+function frame(title, body, foot){
+  return `<div class="dlg">
+    <div class="dlg__head"><h2 id="dlg-title">${esc(title)}</h2></div>
+    <div class="dlg__body">${body}</div>
+    <div class="dlg__foot">${foot}</div>
+  </div>`;
+}
+const done = title => "✓ " + title;
+const btnClose = (key = "close", primary = false) =>
+  `<button type="button" class="btn ${primary ? "btn--primary" : ""}" data-action="close" ${primary ? "autofocus" : ""}>${esc(t(key))}</button>`;
+const note = (kind, html) => `<div class="note note--${kind}">${html}</div>`;
+
+function changesTable(before, after, keys){
+  const LABEL = { pending:"cardPending", received:"eqReceived", available:"cardBank", noPhysical:"cardGap" };
+  return `<table class="changes"><tbody>${keys.map(k => {
+    const same = before[k] === after[k];
+    return `<tr class="${k === "pending" ? "official" : ""}"><th scope="row">${esc(t(LABEL[k]))}</th>
+      <td>${same
+        ? `<strong>${after[k]}</strong><span class="same">(${esc(t("unchanged"))})</span>`
+        : `<span>${before[k]}</span><span class="arrow" aria-hidden="true">→</span><span class="sr-only"> ${esc(t("becomes"))} </span><strong>${after[k]}</strong>`}</td></tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+function renderModal(){
+  const m = ui.modal;
+  const R = { add:modalAdd, give:modalGive, ret:modalReturn, govt:modalGovt, reset:modalReset }[m.type];
+  dlg.innerHTML = R(m);
+}
+
+function modalAdd(m){
+  if (m.step === "added") return frame(done(t("addedTitle")),
+    note("good", th("addedMsg", { code:m.code })) + changesTable(m.before, m.after, ["available", "pending"]),
+    btnClose("done", true));
+  if (m.step === "rejected") return frame(t("rejectedTitle"),
+    note("rule", esc(t("rejectedMsg"))) + changesTable(m.before, m.after, ["available"]),
+    btnClose("done", true));
+  return frame(t("addBook"),
+    `<p class="q" id="add-q">${esc(t("addQ"))}</p>
+     <p class="hint">${esc(t("addHint"))}</p>
+     <div class="choices" role="group" aria-labelledby="add-q">
+       <button type="button" class="choice choice--yes" data-action="add-yes" autofocus>✓ ${esc(t("yesCurrent"))}</button>
+       <button type="button" class="choice choice--no" data-action="add-no">✗ ${esc(t("noOld"))}</button>
+     </div>
+     ${note("plain", esc(t("voluntary")))}`,
+    btnClose("cancel"));
+}
+
+function modalGive(m){
+  if (m.step === "done") return frame(done(t("givenTitle")),
+    note("good", th("givenMsg", { code:m.code, name:m.name })) +
+    note("rule", `<strong>${esc(t("shortageUnchanged", { n:m.after.pending }))}</strong>`) +
+    changesTable(m.before, m.after, ["pending", "available", "noPhysical"]),
+    btnClose("done", true));
+  const shelf = data.copies.filter(c => !c.holder).sort((a, b) => a.code.localeCompare(b.code));
+  const waiting = data.students.filter(s => !s.govt && !copyOf(s)).sort(byLongestWait);
+  if (!shelf.length) return frame(t("giveBook"), note("wait", esc(t("noCopies"))), btnClose("close", true));
+  if (!waiting.length) return frame(t("giveBook"), note("good", esc(t("noWaiting"))), btnClose("close", true));
+  const options = waiting.map((s, i) => `<li><label>
+      <input type="radio" name="child" value="${esc(s.id)}" ${i === 0 ? "checked autofocus" : ""}>
+      <span class="who">${esc(s.name)}</span><span class="when">${esc(days(s.days))}</span></label></li>`).join("");
+  return frame(t("giveBook"),
+    `<fieldset><legend class="q">${esc(t("giveQ"))}</legend><p class="hint">${esc(t("giveHint"))}</p><ul class="pick">${options}</ul></fieldset>
+     <div class="copyline"><span>${esc(t("copyToGive"))}</span><span class="code">${esc(shelf[0].code)}</span></div>
+     ${note("rule", esc(t("willStay", { n:officialSchoolRow().pending })))}`,
+    `${btnClose("cancel")}<button type="button" class="btn btn--primary" data-action="give-confirm">${esc(t("giveBtn"))}</button>`);
+}
+
+function modalReturn(m){
+  if (m.step === "done") return frame(done(t("returnedTitle")),
+    note("good", th("returnedMsg", { code:m.code, name:m.name })) +
+    (m.stillWaiting ? note("wait", esc(t("stillWaitingNote", { name:m.name }))) : "") +
+    changesTable(m.before, m.after, ["pending", "available", "noPhysical"]),
+    btnClose("done", true));
+  const lent = data.copies.filter(c => c.holder).map(c => ({ c, s:studentById(c.holder) }))
+    .sort((a, b) => (b.s.govt - a.s.govt) || a.c.code.localeCompare(b.c.code));
+  if (!lent.length) return frame(t("returnBook"), note("plain", esc(t("noneIssued"))), btnClose("close", true));
+  const rows = lent.map(({ c, s }, i) => `<li class="${s.govt ? "due" : ""}">
+      <span><span class="who">${esc(s.name)}</span><span class="meta"><span class="code">${esc(c.code)}</span>${s.govt ? " · ↩ " + esc(t("returnDueNote")) : ""}</span></span>
+      <button type="button" class="btn btn--primary" data-action="return-one" data-code="${esc(c.code)}" ${i === 0 ? "autofocus" : ""}>${esc(t("returnedBtn"))}</button></li>`).join("");
+  return frame(t("returnQ"), `<ul class="rows">${rows}</ul>`, btnClose("cancel"));
+}
+
+function modalGovt(m){
+  if (m.step === "done") {
+    const recall = m.recall.length
+      ? note("wait", `<strong>${esc(t("recallTitle"))}</strong><ul class="namelist">${m.recall.map(r => `<li>${esc(r.name)} — <span class="code">${esc(r.code)}</span></li>`).join("")}</ul>`)
+      : "";
+    return frame(done(t("govDoneTitle")),
+      changesTable(m.before, m.after, ["pending", "received", "noPhysical", "available"]) +
+      note("plain", `${esc(t("handOut"))} <strong>${m.handed.map(esc).join(", ")}</strong>`) +
+      recall + note("lock", esc(t("bankSeparate"))),
+      (m.recall.length ? `<button type="button" class="btn" data-action="goto-return">${esc(t("openReturn"))}</button>` : "") + btnClose("done", true));
+  }
+  const pending = officialSchoolRow().pending;
+  if (pending === 0) return frame(t("govArrived"), note("good", esc(t("nonePending"))), btnClose("close", true));
+  return frame(t("govArrived"),
+    `<label class="q" for="qty">${esc(t("govQ"))}</label>
+     <p class="hint" id="qty-hint">${esc(t("govHint"))}</p>
+     <div class="stepper">
+       <button type="button" data-action="qty-minus" aria-label="${esc(t("fewer"))}">−</button>
+       <input id="qty" type="number" inputmode="numeric" min="1" max="${pending}" step="1" value="${m.qty}" aria-describedby="qty-hint qty-err" autofocus>
+       <button type="button" data-action="qty-plus" aria-label="${esc(t("more"))}">+</button>
+     </div>
+     <p class="hint">${esc(t("pendingBefore", { n:pending }))}</p>
+     <p class="error" id="qty-err" role="alert">${m.error ? esc(t("qtyError", { max:pending })) : ""}</p>
+     ${note("rule", esc(t("rule")))}`,
+    `${btnClose("cancel")}<button type="button" class="btn btn--primary" data-action="govt-confirm">${esc(t("govBtn"))}</button>`);
+}
+
+function modalReset(){
+  return frame(t("resetQ"), `<p>${esc(t("resetMsg"))}</p>`,
+    `${btnClose("cancel")}<button type="button" class="btn btn--danger" data-action="reset-confirm" autofocus>${esc(t("resetYes"))}</button>`);
+}
+
+/* ==========================================================================
+   8. State changes
+   ========================================================================== */
+function addBook(isCurrent){
+  const before = snapshot();
+  if (!isCurrent) {
+    addLog("rejected", {});
+    saveData(); render();
+    openModal({ type:"add", step:"rejected", before, after:snapshot() });
+    announce(t("rejectedTitle"));
+    return;
+  }
+  const code = copyCode(data.nextCopy++);
+  data.copies.push({ code, holder:null });
+  addLog("added", { code });
+  saveData(); render();
+  openModal({ type:"add", step:"added", code, before, after:snapshot() });
+  announce(t("addedTitle") + ": " + code);
+}
+
+function giveBook(){
+  const picked = dlg.querySelector("input[name=child]:checked");
+  const s = picked && studentById(picked.value);
+  const copy = data.copies.filter(c => !c.holder).sort((a, b) => a.code.localeCompare(b.code))[0];
+  if (!s || s.govt || copyOf(s) || !copy) return;
+  const before = snapshot();
+  copy.holder = s.id;                 // Book Bank changes…
+  addLog("issued", { code:copy.code, name:s.name });
+  saveData(); render();               // …official figures are untouched by design.
+  const after = snapshot();
+  openModal({ type:"give", step:"done", name:s.name, code:copy.code, before, after });
+  announce(t("givenTitle") + ". " + t("shortageUnchanged", { n:after.pending }));
+}
+
+function returnBook(code){
+  const copy = data.copies.find(c => c.code === code);
+  if (!copy || !copy.holder) return;
+  const s = studentById(copy.holder);
+  const before = snapshot();
+  copy.holder = null;
+  addLog("returned", { code, name:s.name });
+  saveData(); render();
+  openModal({ type:"ret", step:"done", code, name:s.name, stillWaiting:!s.govt, before, after:snapshot() });
+  announce(t("returnedTitle"));
+}
+
+function recordGovtArrival(){
+  const pending = officialSchoolRow().pending;
+  const input = dlg.querySelector("#qty");
+  const n = Number(input.value);
+  if (!Number.isInteger(n) || n < 1 || n > pending) {
+    ui.modal.qty = input.value; ui.modal.error = true; renderModal();
+    dlg.querySelector("#qty").focus();
+    return;
+  }
+  const before = snapshot();
+  data.govtReceived += n;
+  // Official books go to the longest-waiting children first — a temporary copy never lowers a child's priority.
+  const handed = data.students.filter(s => !s.govt).sort(byLongestWait).slice(0, n);
+  handed.forEach(s => { s.govt = true; });
+  addLog("govt", { n });
+  saveData(); render();
+  const recall = handed.map(s => ({ name:s.name, copy:copyOf(s) })).filter(r => r.copy).map(r => ({ name:r.name, code:r.copy.code }));
+  openModal({ type:"govt", step:"done", before, after:snapshot(), handed:handed.map(s => s.name), recall });
+  announce(t("govDoneTitle") + ". " + t("cardPending") + ": " + officialSchoolRow().pending);
+}
+
+function stepQty(delta){
+  const pending = officialSchoolRow().pending;
+  const input = dlg.querySelector("#qty");
+  const cur = parseInt(input.value, 10);
+  input.value = String(Math.min(pending, Math.max(1, (Number.isFinite(cur) ? cur : 0) + delta)));
+  ui.modal.qty = input.value;
+}
+
+function resetDemo(){
+  data = freshData();
+  ui.shown = null;
+  saveData(); closeModal(); render();
+  announce(t("resetDone"));
+}
+
+/* ==========================================================================
+   9. Printing — one official statement, one optional paper sheet
+   ========================================================================== */
+function statementDoc(){
+  // Official figures only. No Book Bank field exists in this document.
+  const rows = prefs.role === "crc" ? officialRows() : [officialSchoolRow()];
+  const own = officialSchoolRow();
+  const body = rows.map(r => `<tr><td>${esc(r.school)}</td><td class="n">${esc(r.cls)}</td><td>${esc(subject(r.subjectKey))}</td>
+      <td class="n">${r.entitled}</td><td class="n">${r.received}</td><td class="n"><strong>${r.pending}</strong></td><td class="n">${esc(days(r.longest))}</td></tr>`).join("");
+  return `<article class="doc" lang="${prefs.lang}">
+    <h1>${esc(t("rpTitle"))}</h1>
+    <p class="sub">PASS IT ON</p>
+    <div class="meta">
+      ${prefs.role === "crc" ? "" : `<span><strong>${esc(t("schoolCol"))}:</strong> ${esc(SCHOOL.name)}</span>`}
+      <span><strong>${esc(t("rpBlock"))}:</strong> ${esc(SCHOOL.cluster)}</span>
+      <span><strong>${esc(t("monthLabel"))}:</strong> ${esc(monthName())}</span>
+    </div>
+    <table>
+      <thead><tr><th>${esc(t("schoolCol"))}</th><th class="n">${esc(t("classCol"))}</th><th>${esc(t("subjectCol"))}</th><th class="n">${esc(t("entitledCol"))}</th>
+        <th class="n">${esc(t("receivedCol"))}</th><th class="n">${esc(t("pendingCol"))}</th><th class="n">${esc(t("longestCol"))}</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table>
+    <p class="protect">${esc(t("rpImportant"))} ${esc(t("rpNote"))}</p>
+    <p><strong>${esc(t("demandHeading"))}:</strong> ${esc(t("demandText", { n:own.entitled, old:data.lastYearOrder }))} (${esc(own.school)}, ${esc(t("classN", { n:own.cls }))} ${esc(subject(own.subjectKey))})</p>
+    <p>${esc(t("crcFormula"))}</p>
+    <div class="signs"><div>${esc(t(prefs.role === "crc" ? "rpCrcSign" : "rpSign"))}</div><div>${esc(t("rpDate"))}</div></div>
+    <p class="foot-note">${esc(t("rpSource"))} · ${esc(t("printedFrom"))}</p>
+  </article>`;
+}
+
+function sheetDoc(){
+  const blank = Array.from({ length:18 }, () => `<tr class="blank"><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`).join("");
+  return `<article class="doc" lang="${prefs.lang}">
+    <h1>${esc(t("shTitle"))}</h1>
+    <p class="sub">PASS IT ON · ${esc(SCHOOL.name)} · ${esc(t("shSub"))}</p>
+    <div class="rules"><strong>${esc(t("shRules"))}</strong>
+      <ol><li>${esc(t("shRule1"))}</li><li>${esc(t("shRule2"))}</li><li>${esc(t("shRule3"))}</li></ol>
+    </div>
+    <table>
+      <thead><tr><th style="width:12%">${esc(t("shDate"))}</th><th style="width:15%">${esc(t("shCopy"))}</th><th style="width:8%">${esc(t("classCol"))}</th>
+        <th style="width:12%">${esc(t("subjectCol"))}</th><th>${esc(t("shStudent"))}</th><th style="width:14%">${esc(t("shIssRet"))}</th><th style="width:10%">${esc(t("shInit"))}</th></tr></thead>
+      <tbody>${blank}</tbody>
+    </table>
+    <p class="foot-note">${esc(t("papersNote"))}</p>
+  </article>`;
+}
+
+function printDoc(kind){
+  $("#print-root").innerHTML = kind === "sheet" && prefs.role === "school" ? sheetDoc() : statementDoc();
+  window.print();
+}
+// Ctrl+P without a button still prints the official statement, never the app screen.
+window.addEventListener("beforeprint", () => { if (!$("#print-root").innerHTML) $("#print-root").innerHTML = statementDoc(); });
+window.addEventListener("afterprint", () => { $("#print-root").innerHTML = ""; });
+
+/* ==========================================================================
+   10. Events (delegated; no inline handlers)
+   ========================================================================== */
+function setLang(code){
+  if (!I18N[code]) return;
+  prefs.lang = code; savePrefs(); render();
+}
+const ACTIONS = {
+  "set-role":   el => { prefs.role = el.dataset.role; savePrefs(); closeModal(); ui.shown = null; render(); window.scrollTo(0, 0); $("#main").focus({ preventScroll:true }); },
+  "open-add":   el => openModal({ type:"add", step:"ask" }, el),
+  "open-give":  el => openModal({ type:"give", step:"choose" }, el),
+  "open-return":el => openModal({ type:"ret", step:"choose" }, el),
+  "open-govt":  el => openModal({ type:"govt", step:"ask", qty:officialSchoolRow().pending, error:false }, el),
+  "open-reset": el => openModal({ type:"reset" }, el),
+  "add-yes":    () => addBook(true),
+  "add-no":     () => addBook(false),
+  "give-confirm": () => giveBook(),
+  "return-one": el => returnBook(el.dataset.code),
+  "qty-minus":  () => stepQty(-1),
+  "qty-plus":   () => stepQty(1),
+  "govt-confirm": () => recordGovtArrival(),
+  "goto-return": () => { ui.returnFocus = "open-return"; openModal({ type:"ret", step:"choose" }); },
+  "reset-confirm": () => resetDemo(),
+  "print-statement": () => printDoc("statement"),
+  "print-sheet": () => printDoc("sheet"),
+  "close":      () => closeModal()
+};
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-action]");
+  if (el && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el, e);
+});
+langSelect.addEventListener("change", () => setLang(langSelect.value));
+dlg.addEventListener("keydown", e => {
+  if (e.key === "Enter" && e.target.id === "qty") { e.preventDefault(); recordGovtArrival(); }
+});
+// Keep two open tabs (or the phone-frame demo) of the prototype in step.
+window.addEventListener("storage", e => {
+  if (e.key === DATA_KEY || e.key === PREFS_KEY) {
+    prefs = loadPrefs();
+    const d = store.get(DATA_KEY); data = isValidData(d) ? d : freshData();
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
