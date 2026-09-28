@@ -14,9 +14,9 @@ A single-file, offline HTML prototype of a school textbook-continuity service. C
 
 ## What a school can do
 
-- **Classes and subjects:** each one, such as Class 6 Science or Class 7 Maths, is its own register. It has its own official figures, waiting list and Book Bank shelf, and copy codes follow the class and subject (`BB-7-MAT-001`). Use **+ Add class / subject** to enter students entitled and government books already received.
+- **Classes and subjects:** each one, such as Class 6 Science or Class 7 Maths, is its own register. It has its own official figures, waiting list and Book Bank shelf, and copy codes follow the class and subject (`BB-7-MAT-001`). Choose a **Class** button, then a **Subject** button. Use **+ Add class** or **+ Add subject** to enter students entitled and government books already received.
 - **Waiting list:** use **Add or remove children** to list the children who have not received their government book. Paste names or roll numbers, one per line, and choose the "waiting since" date; days waiting then count up by themselves. The list can never name more children than there are books pending.
-- **Four actions:** Add a Book (current edition only), Give a Book (longest wait first), Book Returned, and Govt Books Arrived (tick who received a book).
+- **Four actions:** Add a Book (tap which class and subject the book is for), Give a Book (longest wait first), Book Returned, and Govt Books Arrived (tick who received a book).
 - **CRC / Block view and the monthly statement:** one row per class and subject, built only from enrolment and official receipts.
 
 ## The one rule the system protects

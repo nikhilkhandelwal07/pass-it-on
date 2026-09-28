@@ -163,18 +163,6 @@ html:lang(en) .stamp__label{text-transform:uppercase;font-size:14px}
 .action--govt:active{box-shadow:0 1px 0 var(--red)}
 .action--govt .action__title{color:var(--red)}
 
-/* ---------- Two accounts, kept apart ---------- */
-.accounts{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--ink);background:#fff}
-.account{padding:14px 18px 16px}
-.account+.account{border-left:5px double var(--ink)}
-.account h3{font-size:18px;display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap}
-.account h3 small{font-size:14px;font-weight:700}
-.leaders{list-style:none;margin:10px 0 0;padding:0}
-.leaders li{display:flex;align-items:baseline;gap:8px;padding:6px 0}
-.leaders .dots{flex:1 1 24px;min-width:24px;border-bottom:2px dotted var(--rule-strong);transform:translateY(-5px)}
-.leaders b{font-size:22px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.leaders .total{border-top:1.5px solid var(--ink);margin-top:4px;padding-top:8px;font-weight:700}
-.leaders .total b{border-bottom:4px double currentColor;line-height:1.1}
 .foot-note{font-size:15px;color:var(--muted);margin-top:10px}
 
 /* ---------- Register tables ---------- */
@@ -279,9 +267,22 @@ legend{padding:0;margin-bottom:4px}
 .namelist{margin:6px 0 0;padding-left:20px}
 
 /* ---------- Class & subject bar, forms ---------- */
-.groupbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding-bottom:16px;margin-bottom:22px;border-bottom:1px dashed var(--rule-strong)}
-.groupbar label{font-weight:700;font-size:16px}
-.groupbar select{min-height:46px;min-width:240px;border:1.5px solid var(--ink);border-radius:var(--r);background:#fff;padding:6px 10px;font-size:17px;font-weight:700;color:var(--blue);cursor:pointer}
+/* Class, then subject: two rows of big buttons, the way a teacher thinks about a register */
+.picker{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center;padding-bottom:16px;margin-bottom:22px;border-bottom:1px dashed var(--rule-strong)}
+.picker__label{font-weight:700;font-size:16px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{min-height:46px;padding:6px 14px;border:1.5px solid var(--ink);border-radius:var(--r);background:#fff;font-weight:700;font-size:16px;display:inline-flex;align-items:center;gap:8px}
+.chip:hover{background:var(--blue-tint)}
+.chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.chip small{font-size:13px;font-weight:700;padding:1px 7px;border-radius:3px;background:var(--red-tint);color:var(--red);white-space:nowrap}
+.chip small.ok{background:var(--green-tint);color:var(--green)}
+.chip--add{border-style:dashed;color:var(--blue);font-weight:600}
+.why{margin-top:12px;font-size:16px;color:var(--muted);border-left:4px solid var(--rule-strong);padding:4px 0 4px 12px}
+.why strong{color:var(--ink)}
+.bookpick{border:1.5px solid var(--ink);background:#fff}
+.bookpick__row{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;padding:10px 12px}
+.bookpick__row+.bookpick__row{border-top:1px solid var(--rule)}
+.bookpick__cls{font-weight:800}
 .btn--small{min-height:44px;padding:8px 14px;font-size:15px}
 .listbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:0 0 12px}
 .namecount{font-weight:700}
@@ -300,7 +301,7 @@ legend{padding:0;margin-bottom:4px}
 .checks .when{margin-left:auto;color:var(--muted);white-space:nowrap}
 .demand-list{margin:0;padding-left:20px}
 .demand-list li{margin:4px 0;font-size:17px}
-@media (max-width:640px){.grid2{grid-template-columns:1fr}.groupbar select{flex:1 1 100%;min-width:0}}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}.picker{grid-template-columns:1fr;gap:6px}.bookpick__row{grid-template-columns:1fr;gap:6px}}
 
 /* ---------- Print documents (hidden on screen) ---------- */
 #print-root{display:none}
@@ -318,8 +319,6 @@ legend{padding:0;margin-bottom:4px}
   .ledger__label{grid-area:label}
   .ledger__num{grid-area:num;font-size:48px}
   .ledger__note{grid-area:note;margin-top:6px}
-  .accounts{grid-template-columns:1fr}
-  .account+.account{border-left:0;border-top:5px double var(--ink)}
   .records{grid-template-columns:1fr}
 }
 @media (max-width:700px){
@@ -447,7 +446,8 @@ const LANGS = [
 ];
 const I18N = {
 en: {
-  groupLabel:"Class & subject", addGroup:"Add class / subject", editGroup:"Edit numbers", pendingN:"{n} pending",
+  addClass:"Add class", addSubject:"Add subject", groupTitleSubject:"Add a subject to {cls}", addWhich:"Which book is it?", addWhichHint:"Tap the class and subject printed on the cover.", addNotListed:"Class or subject not here? Add it first with “Add class” or “Add subject”.", whyQ:"Why doesn’t the red number go down when we lend a book?", whyA:"The child can study with it, but the government still owes that child their own book. Only a government delivery lowers the red number.",
+  editGroup:"Change student count", pendingN:"{n} pending",
   groupTitleNew:"Add a class and subject", groupTitleEdit:"Edit class numbers", save:"Save",
   fEntitled:"Students entitled (enrolled in this class)", fReceived:"Govt books already received", fLastYear:"Last year’s order (optional)",
   receivedLocked:"Govt books received change only through “Govt Books Arrived”.",
@@ -457,7 +457,7 @@ en: {
   manageList:"Add or remove children", listTitle:"Children who have not received the govt book", namesLabel:"Names or roll numbers — one per line",
   sinceLabel:"Waiting since", sinceHint:"Usually the first day of the school session.", sinceFuture:"The date cannot be in the future.", addToList:"Add to waiting list",
   namesCount:"Names listed: {named} of {pending} children still owed a govt book", namesMissing:"{n} more children are still owed a book but are not named yet. Add their names.",
-  tooMany:"Only {n} more names can be added — that is how many government books are pending. If a new child has joined, first raise “Students entitled” with Edit numbers.",
+  tooMany:"Only {n} more names can be added — that is how many government books are pending. If a new child has joined, first use “Change student count”.",
   namesEmpty:"Type at least one name.", duplicateName:"Already on the list: {names}.", childrenAdded:"{n} children added to the waiting list.", logListed:"{n} children added to the waiting list",
   onList:"On the list", removeBtn:"Remove", removeBlocked:"Collect copy {code} first", listEmpty:"No children on the list yet.",
   whoGot:"Who received a government book?", whoGotHint:"The longest-waiting children are ticked first. Change the ticks if needed.",
@@ -473,19 +473,19 @@ en: {
   rule:"A donated or borrowed book never closes a government textbook shortage. Only the official government copy does.",
   countsHeading:"Today’s numbers",
   cardPendingTag:"Official · reported to CRC", cardPending:"Government books still pending", cardPendingHelp:"{e} students entitled − {r} govt books received",
-  cardBankTag:"School only · never sent to CRC", cardBank:"Pass It On copies available", cardBankHelp:"{n} temporary copies are with children now",
-  cardGapTag:"Today in class", cardGap:"Children without any physical copy", cardGapHelp:"Today’s learning gap. Not a government number.",
+  cardBankTag:"School only · never sent to CRC", cardBank:"Book Bank books ready to lend", cardBankHelp:"{n} are with children now",
+  cardGapTag:"Today in class", cardGap:"Children still without any book", cardGapHelp:"No government book and no borrowed book yet.",
   actionsHeading:"What do you want to do?",
-  addBook:"Add a Book", addBookSub:"A family gives a current-edition book",
+  addBook:"Add a Book", addBookSub:"A family gives last year’s textbook",
   giveBook:"Give a Book", giveBookSub:"Lend a temporary copy to a waiting child",
   returnBook:"Book Returned", returnBookSub:"A temporary copy comes back to the shelf",
   govArrived:"Govt Books Arrived", govArrivedSub:"Record the official delivery only",
-  twoHeading:"Two separate counts. Never subtract one from the other.",
-  govRecord:"Government record", govRecordTag:"Sent to CRC",
+  
+  
   eqEntitled:"Students entitled", eqReceived:"Govt books received", eqPending:"Govt books pending",
-  classToday:"Classroom today", classTodayTag:"Stays in school",
-  ctWaiting:"Waiting for their govt book", ctLent:"Using a temporary copy meanwhile", ctNone:"No book at all today",
-  twoNote:"A temporary copy helps the child learn today. It does not change the government number.",
+  
+  
+  
   waitHeading:"Children waiting for a government book",
   waitNote:"Longest wait first. Holding a temporary copy never moves a child down this list.",
   waitCount:"{n} still waiting",
@@ -509,11 +509,11 @@ en: {
   demandHeading:"Next-year demand signal", demandText:"{n} students for this class — not last year’s {old}.",
   monthLabel:"Month",
   close:"Close", cancel:"Cancel", done:"Done", becomes:"to", unchanged:"unchanged",
-  addQ:"Is this the current edition of the textbook?", addHint:"Check the year/edition on the first pages. It must match this year’s government textbook.",
+  
   voluntary:"Donations are voluntary. Never pressure a family to give a book.",
-  yesCurrent:"Yes, current edition", noOld:"No, old edition",
-  addedTitle:"Book added", addedMsg:"Copy number {code}. Write it inside the front cover.",
-  rejectedTitle:"Not added", rejectedMsg:"Old editions are not lent to children. Thank the family and give the book back.",
+  
+  addedTitle:"Book added", addedMsg:"{book} — copy number {code}. Write it inside the front cover.",
+  
   giveQ:"Who should get a temporary copy?", giveHint:"The child who has waited longest is first.",
   copyToGive:"Copy to give", giveBtn:"Give temporary copy", willStay:"Government books still pending will stay {n}.",
   givenTitle:"Temporary book issued", givenMsg:"Copy {code} given to {name} to take home.",
@@ -542,7 +542,8 @@ en: {
   printedFrom:"Printed from the PASS IT ON prototype"
 },
 hi: {
-  groupLabel:"कक्षा और विषय", addGroup:"कक्षा / विषय जोड़ें", editGroup:"संख्याएँ बदलें", pendingN:"{n} बाकी",
+  addClass:"कक्षा जोड़ें", addSubject:"विषय जोड़ें", groupTitleSubject:"{cls} में विषय जोड़ें", addWhich:"यह कौन-सी किताब है?", addWhichHint:"कवर पर छपी कक्षा और विषय चुनें।", addNotListed:"कक्षा या विषय यहाँ नहीं है? पहले “कक्षा जोड़ें” या “विषय जोड़ें” से जोड़ें।", whyQ:"किताब उधार देने पर लाल संख्या क्यों नहीं घटती?", whyA:"बच्चा उससे पढ़ सकता है, पर सरकार पर अब भी उस बच्चे की अपनी किताब बाकी है। लाल संख्या केवल सरकारी किताबें आने पर घटती है।",
+  editGroup:"विद्यार्थी संख्या बदलें", pendingN:"{n} बाकी",
   groupTitleNew:"नई कक्षा और विषय जोड़ें", groupTitleEdit:"कक्षा की संख्याएँ बदलें", save:"सहेजें",
   fEntitled:"हकदार विद्यार्थी (इस कक्षा में नामांकित)", fReceived:"पहले से मिली सरकारी किताबें", fLastYear:"पिछले साल का ऑर्डर (वैकल्पिक)",
   receivedLocked:"मिली सरकारी किताबें केवल “सरकारी किताबें आईं” से बदलती हैं।",
@@ -552,7 +553,7 @@ hi: {
   manageList:"बच्चे जोड़ें या हटाएँ", listTitle:"जिन बच्चों को सरकारी किताब नहीं मिली", namesLabel:"नाम या रोल नंबर — हर पंक्ति में एक",
   sinceLabel:"कब से इंतज़ार", sinceHint:"आमतौर पर स्कूल सत्र का पहला दिन।", sinceFuture:"तारीख भविष्य की नहीं हो सकती।", addToList:"इंतज़ार सूची में जोड़ें",
   namesCount:"सूची में नाम: {pending} में से {named} (जिन्हें अभी सरकारी किताब मिलनी है)", namesMissing:"{n} और बच्चों को किताब मिलनी है, पर उनके नाम अभी सूची में नहीं हैं। उनके नाम जोड़ें।",
-  tooMany:"केवल {n} और नाम जोड़े जा सकते हैं — इतनी ही सरकारी किताबें बाकी हैं। अगर कोई नया बच्चा आया है, तो पहले “संख्याएँ बदलें” से हकदार विद्यार्थी बढ़ाएँ।",
+  tooMany:"केवल {n} और नाम जोड़े जा सकते हैं — इतनी ही सरकारी किताबें बाकी हैं। अगर कोई नया बच्चा आया है, तो पहले “विद्यार्थी संख्या बदलें” दबाएँ।",
   namesEmpty:"कम से कम एक नाम लिखें।", duplicateName:"पहले से सूची में: {names}।", childrenAdded:"{n} बच्चे इंतज़ार सूची में जोड़े गए।", logListed:"{n} बच्चे इंतज़ार सूची में जोड़े गए",
   onList:"सूची में", removeBtn:"हटाएँ", removeBlocked:"पहले प्रति {code} वापस लें", listEmpty:"सूची में अभी कोई बच्चा नहीं।",
   whoGot:"किसे सरकारी किताब मिली?", whoGotHint:"सबसे लंबे इंतज़ार वाले बच्चे पहले से चुने हैं। ज़रूरत हो तो बदलें।",
@@ -568,19 +569,19 @@ hi: {
   rule:"दान या उधार की किताब सरकारी पाठ्यपुस्तक की कमी को कभी पूरा नहीं करती। यह कमी केवल सरकारी किताब मिलने पर ही पूरी होती है।",
   countsHeading:"आज की संख्याएँ",
   cardPendingTag:"सरकारी · CRC को भेजी जाती है", cardPending:"सरकारी किताबें अभी बाकी", cardPendingHelp:"{e} हकदार विद्यार्थी − {r} मिली सरकारी किताबें",
-  cardBankTag:"केवल स्कूल · CRC को कभी नहीं", cardBank:"Pass It On किताबें उपलब्ध", cardBankHelp:"{n} अस्थायी किताबें अभी बच्चों के पास हैं",
-  cardGapTag:"आज कक्षा में", cardGap:"जिन बच्चों के पास कोई किताब नहीं", cardGapHelp:"आज की पढ़ाई की कमी। यह सरकारी संख्या नहीं है।",
+  cardBankTag:"केवल स्कूल · CRC को कभी नहीं", cardBank:"पुस्तक बैंक में उधार देने लायक किताबें", cardBankHelp:"{n} अभी बच्चों के पास हैं",
+  cardGapTag:"आज कक्षा में", cardGap:"जिन बच्चों के पास अभी कोई किताब नहीं", cardGapHelp:"न सरकारी किताब मिली, न उधार की किताब।",
   actionsHeading:"आप क्या करना चाहते हैं?",
-  addBook:"किताब जमा करें", addBookSub:"परिवार वर्तमान संस्करण की किताब देता है",
+  addBook:"किताब जमा करें", addBookSub:"परिवार पिछले साल की पाठ्यपुस्तक देता है",
   giveBook:"किताब दें", giveBookSub:"इंतज़ार कर रहे बच्चे को अस्थायी किताब दें",
   returnBook:"किताब वापस आई", returnBookSub:"अस्थायी किताब अलमारी में वापस",
   govArrived:"सरकारी किताबें आईं", govArrivedSub:"केवल सरकारी डिलीवरी दर्ज करें",
-  twoHeading:"दो अलग गिनतियाँ। एक को दूसरी से कभी न घटाएँ।",
-  govRecord:"सरकारी रिकॉर्ड", govRecordTag:"CRC को भेजा जाता है",
+  
+  
   eqEntitled:"हकदार विद्यार्थी", eqReceived:"मिली सरकारी किताबें", eqPending:"बाकी सरकारी किताबें",
-  classToday:"आज की कक्षा", classTodayTag:"स्कूल में ही रहता है",
-  ctWaiting:"अपनी सरकारी किताब का इंतज़ार", ctLent:"तब तक अस्थायी किताब से पढ़ रहे", ctNone:"आज कोई किताब नहीं",
-  twoNote:"अस्थायी किताब बच्चे को आज पढ़ने में मदद करती है। इससे सरकारी संख्या नहीं बदलती।",
+  
+  
+  
   waitHeading:"सरकारी किताब का इंतज़ार कर रहे बच्चे",
   waitNote:"सबसे लंबा इंतज़ार सबसे ऊपर। अस्थायी किताब मिलने से बच्चा इस सूची में नीचे नहीं जाता।",
   waitCount:"{n} अभी इंतज़ार में",
@@ -604,11 +605,11 @@ hi: {
   demandHeading:"अगले साल की मांग का संकेत", demandText:"इस कक्षा के लिए {n} विद्यार्थी — पिछले साल के {old} नहीं।",
   monthLabel:"माह",
   close:"बंद करें", cancel:"रद्द करें", done:"ठीक है", becomes:"से", unchanged:"कोई बदलाव नहीं",
-  addQ:"क्या यह पाठ्यपुस्तक का वर्तमान संस्करण है?", addHint:"पहले पन्नों पर वर्ष/संस्करण देखें। यह इस साल की सरकारी पाठ्यपुस्तक से मिलना चाहिए।",
+  
   voluntary:"दान स्वैच्छिक है। किसी परिवार पर किताब देने का दबाव न डालें।",
-  yesCurrent:"हाँ, वर्तमान संस्करण", noOld:"नहीं, पुराना संस्करण",
-  addedTitle:"किताब जोड़ी गई", addedMsg:"प्रति संख्या {code}। इसे कवर के अंदर लिखें।",
-  rejectedTitle:"नहीं जोड़ी गई", rejectedMsg:"पुराने संस्करण बच्चों को नहीं दिए जाते। परिवार को धन्यवाद दें और किताब लौटा दें।",
+  
+  addedTitle:"किताब जोड़ी गई", addedMsg:"{book} — प्रति संख्या {code}। इसे कवर के अंदर लिखें।",
+  
   giveQ:"अस्थायी किताब किसे दें?", giveHint:"सबसे लंबे समय से इंतज़ार करने वाला बच्चा सबसे ऊपर है।",
   copyToGive:"दी जाने वाली प्रति", giveBtn:"अस्थायी किताब दें", willStay:"बाकी सरकारी किताबें {n} ही रहेंगी।",
   givenTitle:"अस्थायी किताब दी गई", givenMsg:"प्रति {code} {name} को घर ले जाने के लिए दी गई।",
@@ -637,7 +638,8 @@ hi: {
   printedFrom:"PASS IT ON प्रोटोटाइप से प्रिंट"
 },
 or: {
-  groupLabel:"ଶ୍ରେଣୀ ଓ ବିଷୟ", addGroup:"ଶ୍ରେଣୀ / ବିଷୟ ଯୋଡ଼ନ୍ତୁ", editGroup:"ସଂଖ୍ୟା ବଦଳାନ୍ତୁ", pendingN:"{n} ବାକି",
+  addClass:"ଶ୍ରେଣୀ ଯୋଡ଼ନ୍ତୁ", addSubject:"ବିଷୟ ଯୋଡ଼ନ୍ତୁ", groupTitleSubject:"{cls}ରେ ବିଷୟ ଯୋଡ଼ନ୍ତୁ", addWhich:"ଏହା କେଉଁ ବହି?", addWhichHint:"ମଲାଟରେ ଛପା ଶ୍ରେଣୀ ଓ ବିଷୟ ଦବାନ୍ତୁ।", addNotListed:"ଶ୍ରେଣୀ ବା ବିଷୟ ଏଠାରେ ନାହିଁ? ପ୍ରଥମେ “ଶ୍ରେଣୀ ଯୋଡ଼ନ୍ତୁ” ବା “ବିଷୟ ଯୋଡ଼ନ୍ତୁ” ଦ୍ୱାରା ଯୋଡ଼ନ୍ତୁ।", whyQ:"ବହି ଧାର ଦେଲେ ଲାଲ ସଂଖ୍ୟା କାହିଁକି କମେ ନାହିଁ?", whyA:"ପିଲା ସେଥିରେ ପଢ଼ିପାରେ, କିନ୍ତୁ ସରକାରଙ୍କ ଠାରୁ ସେହି ପିଲାର ନିଜ ବହି ଏବେ ବି ବାକି। କେବଳ ସରକାରୀ ବହି ଆସିଲେ ଲାଲ ସଂଖ୍ୟା କମେ।",
+  editGroup:"ଛାତ୍ରଛାତ୍ରୀ ସଂଖ୍ୟା ବଦଳାନ୍ତୁ", pendingN:"{n} ବାକି",
   groupTitleNew:"ନୂଆ ଶ୍ରେଣୀ ଓ ବିଷୟ ଯୋଡ଼ନ୍ତୁ", groupTitleEdit:"ଶ୍ରେଣୀର ସଂଖ୍ୟା ବଦଳାନ୍ତୁ", save:"ସେଭ କରନ୍ତୁ",
   fEntitled:"ହକଦାର ଛାତ୍ରଛାତ୍ରୀ (ଏହି ଶ୍ରେଣୀରେ ନାମଲେଖା)", fReceived:"ପୂର୍ବରୁ ମିଳିଥିବା ସରକାରୀ ବହି", fLastYear:"ଗତ ବର୍ଷର ଅର୍ଡର (ବୈକଳ୍ପିକ)",
   receivedLocked:"ମିଳିଥିବା ସରକାରୀ ବହି କେବଳ “ସରକାରୀ ବହି ଆସିଲା” ଦ୍ୱାରା ବଦଳେ।",
@@ -647,7 +649,7 @@ or: {
   manageList:"ପିଲା ଯୋଡ଼ନ୍ତୁ ବା ହଟାନ୍ତୁ", listTitle:"ଯେଉଁ ପିଲା ସରକାରୀ ବହି ପାଇନାହାନ୍ତି", namesLabel:"ନାମ କିମ୍ବା ରୋଲ ନମ୍ବର — ପ୍ରତି ଧାଡ଼ିରେ ଗୋଟିଏ",
   sinceLabel:"କେବେଠାରୁ ଅପେକ୍ଷା", sinceHint:"ସାଧାରଣତଃ ସ୍କୁଲ ସତ୍ରର ପ୍ରଥମ ଦିନ।", sinceFuture:"ତାରିଖ ଭବିଷ୍ୟତର ହୋଇପାରିବ ନାହିଁ।", addToList:"ଅପେକ୍ଷା ତାଲିକାରେ ଯୋଡ଼ନ୍ତୁ",
   namesCount:"ତାଲିକାରେ ନାମ: {pending} ମଧ୍ୟରୁ {named} (ଯେଉଁମାନଙ୍କୁ ସରକାରୀ ବହି ମିଳିବା ବାକି)", namesMissing:"ଆଉ {n} ଜଣ ପିଲାଙ୍କୁ ବହି ମିଳିବା ବାକି, କିନ୍ତୁ ସେମାନଙ୍କ ନାମ ଏପର୍ଯ୍ୟନ୍ତ ତାଲିକାରେ ନାହିଁ। ସେମାନଙ୍କ ନାମ ଯୋଡ଼ନ୍ତୁ।",
-  tooMany:"କେବଳ ଆଉ {n}ଟି ନାମ ଯୋଡ଼ିହେବ — ଏତିକି ସରକାରୀ ବହି ବାକି ଅଛି। ନୂଆ ପିଲା ଆସିଥିଲେ, ପ୍ରଥମେ “ସଂଖ୍ୟା ବଦଳାନ୍ତୁ”ରେ ହକଦାର ଛାତ୍ରଛାତ୍ରୀ ବଢ଼ାନ୍ତୁ।",
+  tooMany:"କେବଳ ଆଉ {n}ଟି ନାମ ଯୋଡ଼ିହେବ — ଏତିକି ସରକାରୀ ବହି ବାକି ଅଛି। ନୂଆ ପିଲା ଆସିଥିଲେ, ପ୍ରଥମେ “ଛାତ୍ରଛାତ୍ରୀ ସଂଖ୍ୟା ବଦଳାନ୍ତୁ” ଦବାନ୍ତୁ।",
   namesEmpty:"ଅତି କମରେ ଗୋଟିଏ ନାମ ଲେଖନ୍ତୁ।", duplicateName:"ପୂର୍ବରୁ ତାଲିକାରେ ଅଛି: {names}।", childrenAdded:"{n} ଜଣ ପିଲା ଅପେକ୍ଷା ତାଲିକାରେ ଯୋଡ଼ାଗଲେ।", logListed:"{n} ଜଣ ପିଲା ଅପେକ୍ଷା ତାଲିକାରେ ଯୋଡ଼ାଗଲେ",
   onList:"ତାଲିକାରେ", removeBtn:"ହଟାନ୍ତୁ", removeBlocked:"ପ୍ରଥମେ ପ୍ରତି {code} ଫେରାଇ ନିଅନ୍ତୁ", listEmpty:"ତାଲିକାରେ ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ପିଲା ନାହିଁ।",
   whoGot:"କିଏ ସରକାରୀ ବହି ପାଇଲେ?", whoGotHint:"ଅଧିକ ଦିନ ଅପେକ୍ଷା କରିଥିବା ପିଲା ପ୍ରଥମେ ବଛାଯାଇଛନ୍ତି। ଦରକାର ହେଲେ ବଦଳାନ୍ତୁ।",
@@ -663,19 +665,19 @@ or: {
   rule:"ଦାନ କିମ୍ବା ଧାର ବହି ସରକାରୀ ପାଠ୍ୟପୁସ୍ତକ ଅଭାବକୁ କେବେ ପୂରଣ କରେ ନାହିଁ। କେବଳ ସରକାରୀ ବହି ମିଳିଲେ ହିଁ ତାହା ପୂରଣ ହୁଏ।",
   countsHeading:"ଆଜିର ସଂଖ୍ୟା",
   cardPendingTag:"ସରକାରୀ · CRCକୁ ଜଣାଯାଏ", cardPending:"ସରକାରୀ ବହି ଏବେ ବି ବାକି", cardPendingHelp:"{e} ହକଦାର ଛାତ୍ରଛାତ୍ରୀ − {r} ମିଳିଥିବା ସରକାରୀ ବହି",
-  cardBankTag:"କେବଳ ସ୍କୁଲ ପାଇଁ · CRCକୁ କେବେ ନୁହେଁ", cardBank:"Pass It On ବହି ଉପଲବ୍ଧ", cardBankHelp:"{n}ଟି ଅସ୍ଥାୟୀ ବହି ଏବେ ପିଲାଙ୍କ ପାଖରେ",
-  cardGapTag:"ଆଜି ଶ୍ରେଣୀରେ", cardGap:"ଯେଉଁ ପିଲାଙ୍କ ପାଖରେ କୌଣସି ବହି ନାହିଁ", cardGapHelp:"ଆଜିର ପଢ଼ା ଅଭାବ। ଏହା ସରକାରୀ ସଂଖ୍ୟା ନୁହେଁ।",
+  cardBankTag:"କେବଳ ସ୍କୁଲ ପାଇଁ · CRCକୁ କେବେ ନୁହେଁ", cardBank:"ଧାର ଦେବା ପାଇଁ ବହି ବ୍ୟାଙ୍କରେ ଥିବା ବହି", cardBankHelp:"{n}ଟି ଏବେ ପିଲାଙ୍କ ପାଖରେ",
+  cardGapTag:"ଆଜି ଶ୍ରେଣୀରେ", cardGap:"ଏବେ ବି କୌଣସି ବହି ନଥିବା ପିଲା", cardGapHelp:"ସରକାରୀ ବହି ବି ନାହିଁ, ଧାର ବହି ବି ନାହିଁ।",
   actionsHeading:"ଆପଣ କ’ଣ କରିବାକୁ ଚାହାନ୍ତି?",
-  addBook:"ବହି ଜମା କରନ୍ତୁ", addBookSub:"ପରିବାର ଚଳିତ ସଂସ୍କରଣର ବହି ଦିଅନ୍ତି",
+  addBook:"ବହି ଜମା କରନ୍ତୁ", addBookSub:"ପରିବାର ଗତ ବର୍ଷର ପାଠ୍ୟପୁସ୍ତକ ଦିଅନ୍ତି",
   giveBook:"ବହି ଦିଅନ୍ତୁ", giveBookSub:"ଅପେକ୍ଷାରେ ଥିବା ପିଲାକୁ ଅସ୍ଥାୟୀ ବହି ଦିଅନ୍ତୁ",
   returnBook:"ବହି ଫେରିଲା", returnBookSub:"ଅସ୍ଥାୟୀ ବହି ଥାକକୁ ଫେରିଲା",
   govArrived:"ସରକାରୀ ବହି ଆସିଲା", govArrivedSub:"କେବଳ ସରକାରୀ ଯୋଗାଣ ଲେଖନ୍ତୁ",
-  twoHeading:"ଦୁଇଟି ଅଲଗା ଗଣନା। ଗୋଟିଏରୁ ଅନ୍ୟଟି କେବେ ବିୟୋଗ କରନ୍ତୁ ନାହିଁ।",
-  govRecord:"ସରକାରୀ ରେକର୍ଡ", govRecordTag:"CRCକୁ ପଠାଯାଏ",
+  
+  
   eqEntitled:"ହକଦାର ଛାତ୍ରଛାତ୍ରୀ", eqReceived:"ମିଳିଥିବା ସରକାରୀ ବହି", eqPending:"ବାକି ସରକାରୀ ବହି",
-  classToday:"ଆଜିର ଶ୍ରେଣୀ", classTodayTag:"ସ୍କୁଲରେ ହିଁ ରହେ",
-  ctWaiting:"ନିଜ ସରକାରୀ ବହି ପାଇଁ ଅପେକ୍ଷାରେ", ctLent:"ସେପର୍ଯ୍ୟନ୍ତ ଅସ୍ଥାୟୀ ବହିରେ ପଢ଼ୁଛନ୍ତି", ctNone:"ଆଜି କୌଣସି ବହି ନାହିଁ",
-  twoNote:"ଅସ୍ଥାୟୀ ବହି ପିଲାକୁ ଆଜି ପଢ଼ିବାରେ ସାହାଯ୍ୟ କରେ। ଏହା ସରକାରୀ ସଂଖ୍ୟାକୁ ବଦଳାଏ ନାହିଁ।",
+  
+  
+  
   waitHeading:"ସରକାରୀ ବହି ପାଇଁ ଅପେକ୍ଷାରେ ଥିବା ପିଲା",
   waitNote:"ସବୁଠାରୁ ଅଧିକ ଅପେକ୍ଷା ସବୁଠାରୁ ଉପରେ। ଅସ୍ଥାୟୀ ବହି ପାଇଲେ ବି ପିଲା ଏହି ତାଲିକାରେ ତଳକୁ ଯାଏ ନାହିଁ।",
   waitCount:"{n} ଜଣ ଏବେ ବି ଅପେକ୍ଷାରେ",
@@ -699,11 +701,11 @@ or: {
   demandHeading:"ଆସନ୍ତା ବର୍ଷର ଚାହିଦା ସଙ୍କେତ", demandText:"ଏହି ଶ୍ରେଣୀ ପାଇଁ {n} ଜଣ ଛାତ୍ରଛାତ୍ରୀ — ଗତ ବର୍ଷର {old} ନୁହେଁ।",
   monthLabel:"ମାସ",
   close:"ବନ୍ଦ କରନ୍ତୁ", cancel:"ବାତିଲ କରନ୍ତୁ", done:"ଠିକ ଅଛି", becomes:"ରୁ", unchanged:"କୌଣସି ପରିବର୍ତ୍ତନ ନାହିଁ",
-  addQ:"ଏହା କ’ଣ ପାଠ୍ୟପୁସ୍ତକର ଚଳିତ ସଂସ୍କରଣ?", addHint:"ପ୍ରଥମ ପୃଷ୍ଠାରେ ବର୍ଷ/ସଂସ୍କରଣ ଦେଖନ୍ତୁ। ଏହା ଚଳିତ ବର୍ଷର ସରକାରୀ ପାଠ୍ୟପୁସ୍ତକ ସହ ମେଳ ଖାଇବା ଦରକାର।",
+  
   voluntary:"ଦାନ ସ୍ୱେଚ୍ଛାକୃତ। କୌଣସି ପରିବାରକୁ ବହି ଦେବା ପାଇଁ ଚାପ ଦିଅନ୍ତୁ ନାହିଁ।",
-  yesCurrent:"ହଁ, ଚଳିତ ସଂସ୍କରଣ", noOld:"ନା, ପୁରୁଣା ସଂସ୍କରଣ",
-  addedTitle:"ବହି ଯୋଡ଼ାଗଲା", addedMsg:"ପ୍ରତି ନମ୍ବର {code}। ଏହାକୁ ମଲାଟ ଭିତରେ ଲେଖନ୍ତୁ।",
-  rejectedTitle:"ଯୋଡ଼ାଗଲା ନାହିଁ", rejectedMsg:"ପୁରୁଣା ସଂସ୍କରଣ ପିଲାଙ୍କୁ ଦିଆଯାଏ ନାହିଁ। ପରିବାରକୁ ଧନ୍ୟବାଦ ଦେଇ ବହି ଫେରାଇ ଦିଅନ୍ତୁ।",
+  
+  addedTitle:"ବହି ଯୋଡ଼ାଗଲା", addedMsg:"{book} — ପ୍ରତି ନମ୍ବର {code}। ଏହାକୁ ମଲାଟ ଭିତରେ ଲେଖନ୍ତୁ।",
+  
   giveQ:"ଅସ୍ଥାୟୀ ବହି କାହାକୁ ଦେବେ?", giveHint:"ସବୁଠାରୁ ଅଧିକ ଦିନ ଅପେକ୍ଷା କରିଥିବା ପିଲା ସବୁଠାରୁ ଉପରେ।",
   copyToGive:"ଦିଆଯିବା ପ୍ରତି", giveBtn:"ଅସ୍ଥାୟୀ ବହି ଦିଅନ୍ତୁ", willStay:"ବାକି ସରକାରୀ ବହି {n} ହିଁ ରହିବ।",
   givenTitle:"ଅସ୍ଥାୟୀ ବହି ଦିଆଗଲା", givenMsg:"ପ୍ରତି {code} ଘରକୁ ନେବା ପାଇଁ ଦିଆଗଲା · {name}",
@@ -732,7 +734,8 @@ or: {
   printedFrom:"PASS IT ON ପ୍ରୋଟୋଟାଇପରୁ ପ୍ରିଣ୍ଟ"
 },
 mr: {
-  groupLabel:"इयत्ता आणि विषय", addGroup:"इयत्ता / विषय जोडा", editGroup:"संख्या बदला", pendingN:"{n} बाकी",
+  addClass:"इयत्ता जोडा", addSubject:"विषय जोडा", groupTitleSubject:"{cls} मध्ये विषय जोडा", addWhich:"हे कोणते पुस्तक आहे?", addWhichHint:"मुखपृष्ठावर छापलेली इयत्ता आणि विषय निवडा.", addNotListed:"इयत्ता किंवा विषय इथे नाही? आधी “इयत्ता जोडा” किंवा “विषय जोडा” वापरून जोडा.", whyQ:"पुस्तक उसने दिल्यावर लाल संख्या का कमी होत नाही?", whyA:"मूल त्यातून शिकू शकते, पण सरकारकडून त्या मुलाचे स्वतःचे पुस्तक अजून बाकी आहे. फक्त सरकारी पुस्तके आल्यावरच लाल संख्या कमी होते.",
+  editGroup:"विद्यार्थी संख्या बदला", pendingN:"{n} बाकी",
   groupTitleNew:"नवीन इयत्ता आणि विषय जोडा", groupTitleEdit:"इयत्तेची संख्या बदला", save:"जतन करा",
   fEntitled:"हक्कदार विद्यार्थी (या इयत्तेत पटावर)", fReceived:"आधीच मिळालेली सरकारी पुस्तके", fLastYear:"मागील वर्षाची मागणी (ऐच्छिक)",
   receivedLocked:"मिळालेली सरकारी पुस्तके फक्त “सरकारी पुस्तके आली” मधूनच बदलतात.",
@@ -742,7 +745,7 @@ mr: {
   manageList:"मुले जोडा किंवा काढा", listTitle:"ज्यांना सरकारी पुस्तक मिळाले नाही अशी मुले", namesLabel:"नावे किंवा हजेरी क्रमांक — प्रत्येक ओळीत एक",
   sinceLabel:"केव्हापासून प्रतीक्षा", sinceHint:"सहसा शाळेच्या सत्राचा पहिला दिवस.", sinceFuture:"तारीख भविष्यातील असू शकत नाही.", addToList:"प्रतीक्षा यादीत जोडा",
   namesCount:"यादीतील नावे: {pending} पैकी {named} (ज्यांना सरकारी पुस्तक मिळायचे आहे)", namesMissing:"आणखी {n} मुलांना पुस्तक मिळायचे आहे, पण त्यांची नावे अजून यादीत नाहीत. त्यांची नावे जोडा.",
-  tooMany:"फक्त आणखी {n} नावे जोडता येतील — इतकीच सरकारी पुस्तके बाकी आहेत. नवीन मूल आले असेल तर आधी “संख्या बदला” मधून हक्कदार विद्यार्थी वाढवा.",
+  tooMany:"फक्त आणखी {n} नावे जोडता येतील — इतकीच सरकारी पुस्तके बाकी आहेत. नवीन मूल आले असेल तर आधी “विद्यार्थी संख्या बदला” दाबा.",
   namesEmpty:"किमान एक नाव लिहा.", duplicateName:"आधीच यादीत: {names}.", childrenAdded:"{n} मुले प्रतीक्षा यादीत जोडली.", logListed:"{n} मुले प्रतीक्षा यादीत जोडली",
   onList:"यादीत", removeBtn:"काढा", removeBlocked:"आधी प्रत {code} परत घ्या", listEmpty:"यादीत अजून कोणतेही मूल नाही.",
   whoGot:"कोणाला सरकारी पुस्तक मिळाले?", whoGotHint:"सर्वात जास्त प्रतीक्षेतील मुले आधीच निवडली आहेत. गरज असल्यास बदला.",
@@ -758,19 +761,19 @@ mr: {
   rule:"दान केलेले किंवा उसने घेतलेले पुस्तक सरकारी पाठ्यपुस्तकांची तूट कधीही भरून काढत नाही. फक्त अधिकृत सरकारी प्रतच ती भरते.",
   countsHeading:"आजची आकडेवारी",
   cardPendingTag:"अधिकृत · CRC ला कळवली जाते", cardPending:"सरकारी पुस्तके अजून बाकी", cardPendingHelp:"{e} हक्कदार विद्यार्थी − {r} मिळालेली सरकारी पुस्तके",
-  cardBankTag:"फक्त शाळेसाठी · CRC ला कधीच नाही", cardBank:"Pass It On पुस्तके उपलब्ध", cardBankHelp:"{n} तात्पुरती पुस्तके सध्या मुलांकडे आहेत",
-  cardGapTag:"आज वर्गात", cardGap:"ज्या मुलांकडे एकही पुस्तक नाही", cardGapHelp:"आजची शिकण्यातील तूट. ही सरकारी संख्या नाही.",
+  cardBankTag:"फक्त शाळेसाठी · CRC ला कधीच नाही", cardBank:"उसने देण्यासाठी पुस्तक बँकेतील पुस्तके", cardBankHelp:"{n} सध्या मुलांकडे आहेत",
+  cardGapTag:"आज वर्गात", cardGap:"अजूनही एकही पुस्तक नसलेली मुले", cardGapHelp:"ना सरकारी पुस्तक, ना उसने घेतलेले पुस्तक.",
   actionsHeading:"तुम्हाला काय करायचे आहे?",
-  addBook:"पुस्तक जमा करा", addBookSub:"कुटुंब चालू आवृत्तीचे पुस्तक देते",
+  addBook:"पुस्तक जमा करा", addBookSub:"कुटुंब मागील वर्षाचे पाठ्यपुस्तक देते",
   giveBook:"पुस्तक द्या", giveBookSub:"प्रतीक्षेतील मुलाला तात्पुरते पुस्तक द्या",
   returnBook:"पुस्तक परत आले", returnBookSub:"तात्पुरते पुस्तक पुन्हा कपाटात",
   govArrived:"सरकारी पुस्तके आली", govArrivedSub:"फक्त अधिकृत पुरवठा नोंदवा",
-  twoHeading:"दोन वेगळ्या मोजण्या. एकीतून दुसरी कधीही वजा करू नका.",
-  govRecord:"सरकारी नोंद", govRecordTag:"CRC ला पाठवली जाते",
+  
+  
   eqEntitled:"हक्कदार विद्यार्थी", eqReceived:"मिळालेली सरकारी पुस्तके", eqPending:"बाकी सरकारी पुस्तके",
-  classToday:"आजचा वर्ग", classTodayTag:"शाळेतच राहते",
-  ctWaiting:"आपल्या सरकारी पुस्तकाच्या प्रतीक्षेत", ctLent:"तोपर्यंत तात्पुरत्या पुस्तकातून शिकत आहेत", ctNone:"आज एकही पुस्तक नाही",
-  twoNote:"तात्पुरते पुस्तक मुलाला आज शिकायला मदत करते. त्यामुळे सरकारी संख्या बदलत नाही.",
+  
+  
+  
   waitHeading:"सरकारी पुस्तकाच्या प्रतीक्षेत असलेली मुले",
   waitNote:"सर्वात जास्त प्रतीक्षा सर्वात वर. तात्पुरते पुस्तक मिळाले तरी मूल या यादीत खाली जात नाही.",
   waitCount:"{n} अजून प्रतीक्षेत",
@@ -794,11 +797,11 @@ mr: {
   demandHeading:"पुढील वर्षाच्या मागणीचा संकेत", demandText:"या इयत्तेसाठी {n} विद्यार्थी — मागील वर्षाचे {old} नाहीत.",
   monthLabel:"महिना",
   close:"बंद करा", cancel:"रद्द करा", done:"ठीक आहे", becomes:"वरून", unchanged:"बदल नाही",
-  addQ:"हे पाठ्यपुस्तक चालू आवृत्तीचे आहे का?", addHint:"पहिल्या पानांवरील वर्ष/आवृत्ती तपासा. ती या वर्षीच्या सरकारी पाठ्यपुस्तकाशी जुळली पाहिजे.",
+  
   voluntary:"दान ऐच्छिक आहे. कोणत्याही कुटुंबावर पुस्तक देण्यासाठी दबाव आणू नका.",
-  yesCurrent:"होय, चालू आवृत्ती", noOld:"नाही, जुनी आवृत्ती",
-  addedTitle:"पुस्तक जोडले", addedMsg:"प्रत क्रमांक {code}. तो मुखपृष्ठाच्या आत लिहा.",
-  rejectedTitle:"जोडले नाही", rejectedMsg:"जुन्या आवृत्त्या मुलांना दिल्या जात नाहीत. कुटुंबाचे आभार माना आणि पुस्तक परत द्या.",
+  
+  addedTitle:"पुस्तक जोडले", addedMsg:"{book} — प्रत क्रमांक {code}. तो मुखपृष्ठाच्या आत लिहा.",
+  
   giveQ:"तात्पुरते पुस्तक कोणाला द्यायचे?", giveHint:"सर्वात जास्त काळ प्रतीक्षेतील मूल सर्वात वर आहे.",
   copyToGive:"द्यायची प्रत", giveBtn:"तात्पुरते पुस्तक द्या", willStay:"बाकी सरकारी पुस्तकांची संख्या {n} इतकीच राहील.",
   givenTitle:"तात्पुरते पुस्तक दिले", givenMsg:"प्रत {code} {name} ला घरी नेण्यासाठी दिली.",
@@ -1014,16 +1017,25 @@ function markChangedFigures(){
 const sectionHead = (id, title, aside = "", asideClass = "") =>
   `<div class="sec-h"><h2 id="${id}">${esc(title)}</h2>${aside ? `<span class="aside ${asideClass}">${esc(aside)}</span>` : ""}</div>`;
 
-function groupBar(g){
-  const options = sortedGroups().map(x => {
-    const p = officialRowFor(x).pending;
-    return `<option value="${esc(x.id)}" ${x.id === g.id ? "selected" : ""}>${esc(groupLabel(x))} — ${esc(p ? t("pendingN", { n:p }) : t("complete"))}</option>`;
+const classesInUse = () => [...new Set(sortedGroups().map(g => g.cls))];
+function pendingBadge(pending){
+  return pending ? `<small>${esc(t("pendingN", { n:pending }))}</small>` : `<small class="ok">✓ ${esc(t("complete"))}</small>`;
+}
+function picker(g){
+  const classChips = classesInUse().map(cls => {
+    const pending = data.groups.filter(x => x.cls === cls).reduce((a, x) => a + officialRowFor(x).pending, 0);
+    return `<button type="button" class="chip" data-action="pick-class" data-cls="${esc(cls)}" aria-pressed="${cls === g.cls}">${esc(t("classN", { n:cls }))}${pendingBadge(pending)}</button>`;
   }).join("");
-  return `<div class="groupbar">
-    <label for="group-select">${esc(t("groupLabel"))}</label>
-    <select id="group-select">${options}</select>
-    <button type="button" class="btn btn--small" data-action="open-group-new">+ ${esc(t("addGroup"))}</button>
-    <button type="button" class="btn btn--small btn--link" data-action="open-group-edit">${esc(t("editGroup"))}</button>
+  const subjectChips = sortedGroups().filter(x => x.cls === g.cls).map(x =>
+    `<button type="button" class="chip" data-action="pick-group" data-id="${esc(x.id)}" aria-pressed="${x.id === g.id}">${esc(subject(x.subjectKey))}${pendingBadge(officialRowFor(x).pending)}</button>`).join("");
+  return `<div class="picker">
+    <span class="picker__label" id="pick-class-l">${esc(t("classCol"))}</span>
+    <div class="chips" role="group" aria-labelledby="pick-class-l">${classChips}
+      <button type="button" class="chip chip--add" data-action="open-group-new" data-scope="class">+ ${esc(t("addClass"))}</button></div>
+    <span class="picker__label" id="pick-subj-l">${esc(t("subjectCol"))}</span>
+    <div class="chips" role="group" aria-labelledby="pick-subj-l">${subjectChips}
+      <button type="button" class="chip chip--add" data-action="open-group-new" data-scope="subject">+ ${esc(t("addSubject"))}</button>
+      <button type="button" class="btn btn--small btn--link" data-action="open-group-edit">${esc(t("editGroup"))}</button></div>
   </div>`;
 }
 
@@ -1033,7 +1045,7 @@ function schoolView(){
   const named = namedWaiting(g), missing = Math.max(0, o.pending - named);
   return `
   <div class="sheet">
-    ${groupBar(g)}
+    ${picker(g)}
     <section class="title" aria-labelledby="hero-h">
       <p class="kicker">${esc(SCHOOL.name)} · ${esc(groupLabel(g))}</p>
       <h1 id="hero-h"><span>${esc(t("heroA"))}</span><span class="h1b">${esc(t("heroB"))}</span></h1>
@@ -1062,6 +1074,7 @@ function schoolView(){
           <p class="ledger__note">${esc(t("cardGapHelp"))}</p>
         </div>
       </div>
+      <p class="why"><strong>${esc(t("whyQ"))}</strong> ${esc(t("whyA"))}</p>
     </section>
 
     <section class="sec" aria-labelledby="actions-h">
@@ -1072,29 +1085,6 @@ function schoolView(){
         ${actionButton("open-return", "📖↩️", "returnBook", "returnBookSub")}
         ${actionButton("open-govt", "📦✓", "govArrived", "govArrivedSub", "action--govt")}
       </div>
-    </section>
-
-    <section class="sec" aria-labelledby="two-h">
-      ${sectionHead("two-h", t("twoHeading"))}
-      <div class="accounts">
-        <div class="account">
-          <h3>${esc(t("govRecord"))}<small class="c-red">${esc(t("govRecordTag"))}</small></h3>
-          <ul class="leaders">
-            ${leader(t("eqEntitled"), o.entitled)}
-            ${leader(t("eqReceived"), "− " + o.received)}
-            ${leader(t("eqPending"), o.pending, "total c-red")}
-          </ul>
-        </div>
-        <div class="account">
-          <h3>${esc(t("classToday"))}<small class="c-green">${esc(t("classTodayTag"))}</small></h3>
-          <ul class="leaders">
-            ${leader(t("ctWaiting"), o.pending)}
-            ${leader(t("ctLent"), l.covering)}
-            ${leader(t("ctNone"), l.noPhysical, "total c-amber")}
-          </ul>
-        </div>
-      </div>
-      <p class="foot-note">${esc(t("twoNote"))}</p>
     </section>
 
     <section class="sec" aria-labelledby="wait-h">
@@ -1133,10 +1123,6 @@ function schoolView(){
       <p class="foot-note">${esc(t("papersNote"))}</p>
     </section>
   </div>`;
-}
-
-function leader(label, value, cls = ""){
-  return `<li class="${cls}"><span>${esc(label)}</span><span class="dots" aria-hidden="true"></span><b>${esc(value)}</b></li>`;
 }
 
 function actionButton(action, icon, titleKey, subKey, extra = ""){
@@ -1319,20 +1305,23 @@ function renderModal(){
 }
 
 function modalAdd(m){
-  const g = currentGroup();
-  if (m.step === "added") return frame(done(t("addedTitle")),
-    note("good", th("addedMsg", { code:m.code })) + changesTable(m.before, m.after, ["available", "pending"]),
-    btnClose("done", true));
-  if (m.step === "rejected") return frame(t("rejectedTitle"),
-    note("rule", esc(t("rejectedMsg"))) + changesTable(m.before, m.after, ["available"]),
-    btnClose("done", true));
-  return frame(`${t("addBook")} · ${groupLabel(g)}`,
-    `<p class="q" id="add-q">${esc(t("addQ"))}</p>
-     <p class="hint">${esc(t("addHint"))}</p>
-     <div class="choices" role="group" aria-labelledby="add-q">
-       <button type="button" class="choice choice--yes" data-action="add-yes" autofocus>✓ ${esc(t("yesCurrent"))}</button>
-       <button type="button" class="choice choice--no" data-action="add-no">✗ ${esc(t("noOld"))}</button>
-     </div>
+  if (m.step === "added") {
+    const g = data.groups.find(x => x.id === m.groupId);
+    return frame(done(t("addedTitle")),
+      note("good", th("addedMsg", { book:groupLabel(g), code:m.code })) + changesTable(m.before, m.after, ["available", "pending"]),
+      btnClose("done", true));
+  }
+  const current = currentGroup();
+  const rows = classesInUse().map(cls => `<div class="bookpick__row">
+      <span class="bookpick__cls">${esc(t("classN", { n:cls }))}</span>
+      <div class="chips">${sortedGroups().filter(g => g.cls === cls).map(g =>
+        `<button type="button" class="chip" data-action="add-to" data-id="${esc(g.id)}" ${g.id === current.id ? "autofocus" : ""}>+ ${esc(subject(g.subjectKey))}</button>`).join("")}</div>
+    </div>`).join("");
+  return frame(t("addBook"),
+    `<p class="q">${esc(t("addWhich"))}</p>
+     <p class="hint">${esc(t("addWhichHint"))}</p>
+     <div class="bookpick">${rows}</div>
+     <p class="hint">${esc(t("addNotListed"))}</p>
      ${note("plain", esc(t("voluntary")))}`,
     btnClose("cancel"));
 }
@@ -1440,12 +1429,15 @@ function modalGroup(m){
        ${err}`,
       `${btnClose("cancel")}<button type="button" class="btn btn--primary" data-action="group-save">${esc(t("save"))}</button>`);
   }
-  return frame(t("groupTitleNew"),
+  const classField = f.fixedClass
+    ? `<input type="hidden" id="f-class" value="${esc(f.cls)}">`
+    : `<div class="field"><label for="f-class">${esc(t("classCol"))}</label>
+         <select id="f-class" autofocus>${CLASSES.map(c => `<option value="${c}" ${c === f.cls ? "selected" : ""}>${esc(t("classN", { n:c }))}</option>`).join("")}</select></div>`;
+  return frame(f.fixedClass ? t("groupTitleSubject", { cls:t("classN", { n:f.cls }) }) : t("groupTitleNew"),
     `<div class="grid2">
-       <div class="field"><label for="f-class">${esc(t("classCol"))}</label>
-         <select id="f-class" autofocus>${CLASSES.map(c => `<option value="${c}" ${c === f.cls ? "selected" : ""}>${esc(t("classN", { n:c }))}</option>`).join("")}</select></div>
+       ${classField}
        <div class="field"><label for="f-subject">${esc(t("subjectCol"))}</label>
-         <select id="f-subject">${SUBJECTS.map(s => `<option value="${s.key}" ${s.key === f.subjectKey ? "selected" : ""}>${esc(subject(s.key))}</option>`).join("")}</select></div>
+         <select id="f-subject" ${f.fixedClass ? "autofocus" : ""}>${SUBJECTS.map(s => `<option value="${s.key}" ${s.key === f.subjectKey ? "selected" : ""}>${esc(subject(s.key))}</option>`).join("")}</select></div>
        ${numberField("f-entitled", t("fEntitled"), f.entitled)}
        ${numberField("f-received", t("fReceived"), f.govtReceived)}
        ${numberField("f-last", t("fLastYear"), f.lastYearOrder)}
@@ -1488,20 +1480,16 @@ function modalList(m){
 /* ==========================================================================
    8. State changes
    ========================================================================== */
-function addBook(isCurrent){
-  const g = currentGroup();
+function addBook(groupId){
+  const g = data.groups.find(x => x.id === groupId);
+  if (!g) return;
+  prefs.group = g.id; savePrefs();   // show the register the book was added to
+  ui.shown = null;
   const before = snapshot(g);
-  if (!isCurrent) {
-    addLog(g, "rejected", {});
-    saveData(); render();
-    openModal({ type:"add", step:"rejected", before, after:snapshot(g) });
-    announce(t("rejectedTitle"));
-    return;
-  }
   const code = addCopy(g);
   addLog(g, "added", { code });
   saveData(); render();
-  openModal({ type:"add", step:"added", code, before, after:snapshot(g) });
+  openModal({ type:"add", step:"added", groupId:g.id, code, before, after:snapshot(g) });
   announce(t("addedTitle") + ": " + code);
 }
 
@@ -1603,7 +1591,7 @@ function saveGroup(){
   }
   const cls = dlg.querySelector("#f-class").value, subjectKey = dlg.querySelector("#f-subject").value;
   const received = readInt("f-received") ?? 0;
-  m.form = { cls, subjectKey, entitled, govtReceived:received, lastYearOrder:last };
+  m.form = { cls, fixedClass:m.form.fixedClass, subjectKey, entitled, govtReceived:received, lastYearOrder:last };
   if (data.groups.some(g => g.cls === cls && g.subjectKey === subjectKey)) { m.error = { key:"groupExists", params:{} }; renderModal(); return; }
   if (entitled === null || [entitled, received, last].some(Number.isNaN) || received > entitled) {
     m.error = { key:"numbersError", params:{} }; renderModal(); return;
@@ -1723,10 +1711,22 @@ function setLang(code){
 }
 function openGroupForm(mode, el){
   const g = currentGroup();
-  const form = mode === "edit"
-    ? { entitled:g.entitled, lastYearOrder:g.lastYearOrder }
-    : { cls:"6", subjectKey:"maths", entitled:"", govtReceived:0, lastYearOrder:"" };
+  let form;
+  if (mode === "edit") form = { entitled:g.entitled, lastYearOrder:g.lastYearOrder };
+  else if (el.dataset.scope === "subject") {
+    const taken = data.groups.filter(x => x.cls === g.cls).map(x => x.subjectKey);
+    form = { cls:g.cls, fixedClass:true, subjectKey:(SUBJECTS.find(s => !taken.includes(s.key)) || SUBJECTS[0]).key, entitled:"", govtReceived:0, lastYearOrder:"" };
+  } else {
+    const used = classesInUse().map(Number);
+    const next = CLASSES.find(c => Number(c) > Math.max(...used)) || CLASSES.find(c => !used.includes(Number(c))) || "1";
+    form = { cls:next, subjectKey:"science", entitled:"", govtReceived:0, lastYearOrder:"" };
+  }
   openModal({ type:"group", mode, form, error:null }, el);
+}
+function pickGroup(g, focusSel){
+  if (!g) return;
+  prefs.group = g.id; savePrefs(); ui.shown = null; render();
+  document.querySelector(focusSel)?.focus();
 }
 const ACTIONS = {
   "set-role":   el => { prefs.role = el.dataset.role; savePrefs(); closeModal(); ui.shown = null; render(); window.scrollTo(0, 0); $("#main").focus({ preventScroll:true }); },
@@ -1741,8 +1741,9 @@ const ACTIONS = {
   "group-save": () => saveGroup(),
   "list-add":   () => addToList(),
   "list-remove":el => removeFromList(el.dataset.id),
-  "add-yes":    () => addBook(true),
-  "add-no":     () => addBook(false),
+  "add-to":     el => addBook(el.dataset.id),
+  "pick-class": el => pickGroup(sortedGroups().find(g => g.cls === el.dataset.cls), `[data-action="pick-class"][data-cls="${el.dataset.cls}"]`),
+  "pick-group": el => pickGroup(data.groups.find(g => g.id === el.dataset.id), `[data-action="pick-group"][data-id="${el.dataset.id}"]`),
   "give-confirm": () => giveBook(),
   "return-one": el => returnBook(el.dataset.code),
   "qty-minus":  () => stepQty(-1),
@@ -1760,7 +1761,6 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("change", e => {
   if (e.target === langSelect) setLang(langSelect.value);
-  if (e.target.id === "group-select") { prefs.group = e.target.value; savePrefs(); ui.shown = null; render(); $("#group-select").focus(); }
 });
 dlg.addEventListener("input", e => { if (e.target.id === "qty") retick(); });
 dlg.addEventListener("change", e => { if (e.target.name === "got" && ui.modal) ui.modal.ticked = tickedIds(); });
